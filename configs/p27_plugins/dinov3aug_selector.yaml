@@ -1,0 +1,44 @@
+# P29 augmentation baseline row (DINOv3 + augmentation): selector step. Recipe as configs/p27_selector.yaml.
+status: preregistered
+protocol_doc: docs/P29_AUGMENTATION_BASELINE.md
+seed: 3407
+f1_config: configs/p27_plugins/dinov3aug_f1.yaml
+f1_config_sha256: c1f7a7995207091861260810068249f0897195f8277cccc737eb7ed0443190a9
+f1_reference_decision: reports/p27_localizer/plugins/dinov3aug/f1/LATEST
+anchor_tolerance: 0.001
+localizer_run: outputs/p27_localizer/20260916T164212Z
+localizer_checkpoint: best.pth
+training_crops:
+  split: train
+  max_fit_crops_per_dataset: 3000
+  early_stop_fraction: 0.15
+label:
+  benefit_margin: 0.0
+weights:
+  magnitude_scale: 0.05
+  magnitude_floor: 0.05
+  magnitude_cap: 4.0
+  unsafe_weight: 3.0
+  clean_unsafe_extra_weight: 2.0
+classifier:
+  hidden_dims:
+  - 32
+  - 16
+  dropout: 0.1
+  max_epochs: 300
+  early_stop_patience: 60
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.001
+risk:
+  probability_floor: 0.5
+  threshold_epsilon: 1.0e-06
+  coverage_grid_points: 101
+calibration:
+  clean_drop_target: 0.0025
+  tau_grid_start: 0.5
+  tau_grid_stop: 1.0
+  tau_grid_step: 0.01
+evaluation:
+  primary_path: selector
+  max_selector_versions: 1

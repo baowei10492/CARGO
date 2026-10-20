@@ -1,0 +1,19 @@
+seed: 3407
+image_size: 256
+batch_sizes: [1, 8, 32]
+warmup_iterations: 20
+measurement_iterations: 100
+amp: true
+
+# Registration-veto can make this a real early-exit schedule. Task-veto
+# cannot: its task-disagreement features require both Raw and Aligned logits.
+conditional_coverages: [0.0, 0.25, 0.50, 0.75, 1.0]
+
+# FLOPs are counted once at batch 1 with PyTorch FlopCounterMode. This is a
+# supported-operator count, not a hardware throughput claim.
+count_flops: true
+flop_batch_size: 1
+
+# Latency gates are intentionally absent: vGPU scheduling makes absolute
+# milliseconds host-dependent. The protocol reports ratios and distributions.
+report_percentiles: [0.10, 0.50, 0.90]

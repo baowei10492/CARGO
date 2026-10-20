@@ -1,0 +1,45 @@
+# P27 plug-in row, CD-Lamba: selector step (docs/P27_PLUGIN_AMENDMENT.md).
+# Same recipe as configs/p27_selector.yaml; the F1 reference is this row's F1 run.
+status: preregistered
+protocol_doc: docs/P27_PLUGIN_AMENDMENT.md
+seed: 3407
+f1_config: configs/p27_plugins/cdlamba_f1.yaml
+f1_config_sha256: fe5e260c9d1de90eed4ef9ff2e1206fc4ea362b1d0896f4fef3831a48ff7d31a
+f1_reference_decision: reports/p27_localizer/plugins/cdlamba/f1/LATEST
+anchor_tolerance: 0.001
+localizer_run: outputs/p27_localizer/20260916T164212Z
+localizer_checkpoint: best.pth
+training_crops:
+  split: train
+  max_fit_crops_per_dataset: 3000
+  early_stop_fraction: 0.15
+label:
+  benefit_margin: 0.0
+weights:
+  magnitude_scale: 0.05
+  magnitude_floor: 0.05
+  magnitude_cap: 4.0
+  unsafe_weight: 3.0
+  clean_unsafe_extra_weight: 2.0
+classifier:
+  hidden_dims:
+  - 32
+  - 16
+  dropout: 0.1
+  max_epochs: 300
+  early_stop_patience: 60
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.001
+risk:
+  probability_floor: 0.5
+  threshold_epsilon: 1.0e-06
+  coverage_grid_points: 101
+calibration:
+  clean_drop_target: 0.0025
+  tau_grid_start: 0.5
+  tau_grid_stop: 1.0
+  tau_grid_step: 0.01
+evaluation:
+  primary_path: selector
+  max_selector_versions: 1

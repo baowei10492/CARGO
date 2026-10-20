@@ -1,0 +1,26 @@
+# P31: plug-in rows and localizer ablation under the border-free protocol (docs/P31_BORDER_FREE_REMAINDER.md).
+status: preregistered
+protocol_doc: docs/P31_BORDER_FREE_REMAINDER.md
+p30_config: configs/p30_border_free.yaml          # protocol, localizers, selector recipe, crop margin
+p30_config_sha256: f5b0dfc0d12bf9bb961c47fb9eb19b991b94894e031b616d91a544a62e7fcd52
+
+rows:                                             # the frozen P27 plug-in detectors
+  bit: {LEVIR-CD: configs/p27_plugins/bit_f1.yaml, DSIFN-CD: configs/p27_plugins/bit_f1.yaml,
+        WHU-CD: configs/p27_plugins/bit_whu_f1.yaml}
+  cdlamba: {LEVIR-CD: configs/p27_plugins/cdlamba_f1.yaml, DSIFN-CD: configs/p27_plugins/cdlamba_f1.yaml,
+            WHU-CD: configs/p27_plugins/cdlamba_whu_f1.yaml}
+  cdxlstm: {LEVIR-CD: configs/p27_plugins/cdxlstm_f1.yaml, DSIFN-CD: configs/p27_plugins/cdxlstm_f1.yaml,
+            WHU-CD: configs/p27_plugins/cdxlstm_whu_f1.yaml}
+config_sha256:
+  configs/p27_plugins/bit_f1.yaml: e7a1a862f1398e6c160634d6d4fcd323f3a4acb7ecedaaa07cf3e4efc1384a00
+  configs/p27_plugins/bit_whu_f1.yaml: f786dbc7e3b9d600c6560144054da4ce45d8d2697847c81bb35eda5aa05a64e9
+  configs/p27_plugins/cdlamba_f1.yaml: fe5e260c9d1de90eed4ef9ff2e1206fc4ea362b1d0896f4fef3831a48ff7d31a
+  configs/p27_plugins/cdlamba_whu_f1.yaml: 41c5d41b60681209c01647bdc68e6857e426ab71b18c15297fd1abecb930c28a
+  configs/p27_plugins/cdxlstm_f1.yaml: 853f3c3eceba6116e1c044b716265e30b32d8fd15529c1c9a61fc9d42f023d1d
+  configs/p27_plugins/cdxlstm_whu_f1.yaml: 82c81d4a614b077f3297369c97d8c7fc50535dac3c62d5c1bb985b8b64fc738f
+
+ablation:
+  split: test
+  variants: [v2_full, v2_coarse_only, v2_one_fine_step, v2_no_reliability, v1_full, roma_similarity, sift_similarity]
+  raw_anchor: reports/p30/test/LATEST             # the ablation's raw path must reproduce this run's raw row
+  raw_anchor_tolerance: 0.001

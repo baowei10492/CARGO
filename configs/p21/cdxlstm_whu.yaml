@@ -1,0 +1,83 @@
+# P21 recipe, stage 1: CDxLSTM on WHU-CD, for the P27 plug-in rows
+# (docs/P27_EXPERIMENTS_AMENDMENT.md). Only the data block differs from the DSIFN cell.
+#
+# Data: identical to the DINOv3 row on this dataset (configs/p8_whu_dinov3_partial_ft.yaml,
+# except cache_mode), so every
+# detector sees the same split, crops and positive-crop sampling.
+# Optimisation: the detector's published optimizer and schedule, rescaled to
+# this project's 40 x 8192 sample budget by keeping the schedule's shape
+# (protocol amendment A). Source: rschange configs/cdxlstm.py (SGD 0.05, momentum 0.9, wd 5e-5, step 50 of 200 epochs, gamma 0.1, lr_mode single).
+# Loss: BCE + Dice for every detector (project protocol, not the published
+# loss). Only the nn.Module is imported from rschange.
+status: preregistered
+protocol_doc: docs/P27_EXPERIMENTS_AMENDMENT.md
+cell: {detector: CDxLSTM, dataset: WHU-CD}
+
+experiment:
+  name: p21_cdxlstm_whu
+  seed: 3407
+  output_root: outputs
+
+data:
+  dataset_root: /root/autodl-tmp/rs_cd_work/data/WHU-CD
+  manifest: manifests/datasets/whu_cd.csv
+  train_split: train
+  val_split: val
+  test_split: test
+  train_crop_size: 256
+  eval_crop_size: null
+  num_workers: 8
+  prefetch_factor: 4
+  cache_mode: none
+  normalization: imagenet
+  mask_threshold: 127
+  train_flip: true
+  train_rotate90: true
+  positive_crop_probability: 0.7
+  positive_crop_min_pixels: 64
+  positive_crop_trials: 8
+
+model:
+  name: rschange_detector
+  detector_name: CDxLSTM
+  repo_root: /root/autodl-tmp/rs_cd_work/rschange
+  backbone:
+    type: Base
+    name: Seaformer
+  decoderhead:
+    type: CDXLSTM
+    channels: [64, 128, 192, 256]
+  # Amendment C (protocol section 11): CDxLSTM's native input size. Every
+  # evaluation forward runs on non-overlapping 256-pixel tiles; training is unchanged.
+  inference_tile_size: 256
+
+loss:
+  bce_weight: 1.0
+  dice_weight: 1.0
+  pos_weight: 2.0
+
+training:
+  epochs: 40
+  samples_per_epoch: 8192
+  batch_size: 8                  # published batch; only memory may lower it
+  optimizer: sgd
+  learning_rate: 0.05
+  backbone_learning_rate: null   # lr_mode single
+  momentum: 0.9
+  weight_decay: 0.00005
+  scheduler: step
+  step_fraction: 0.25            # 50 of 200 published epochs
+  step_gamma: 0.1
+  amp: true
+  allow_tf32: true
+  deterministic: false
+  grad_clip_norm: null           # no clipping in the published recipes
+  checkpoint_interval: 5
+  log_interval: 20
+  initial_checkpoint: null
+
+evaluation:
+  batch_size: 8
+  threshold: 0.5
+  validation_interval: 5
+  save_predictions: false

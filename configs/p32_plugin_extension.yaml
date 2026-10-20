@@ -1,0 +1,19 @@
+# P32: the two added detectors under the border-free protocol (docs/P32_PLUGIN_EXTENSION.md).
+#
+# Same runner and same protocol as the frozen rows (tools/run_p31_plugins.py with
+# --config configs/p32_plugin_extension.yaml); only the detectors differ. The frozen
+# P31 config is left untouched so that its rows keep their component digests.
+status: preregistered
+protocol_doc: docs/P32_PLUGIN_EXTENSION.md
+report_root: reports/p32                          # the frozen P31 rows keep reports/p31
+p30_config: configs/p30_border_free.yaml          # protocol, localizers, selector recipe, crop margin
+p30_config_sha256: f5b0dfc0d12bf9bb961c47fb9eb19b991b94894e031b616d91a544a62e7fcd52
+
+rows:                                             # detectors trained with the P21 recipe on this machine
+  snunet: {LEVIR-CD: configs/p32_plugins/snunet_f1.yaml, DSIFN-CD: configs/p32_plugins/snunet_f1.yaml,
+           WHU-CD: configs/p32_plugins/snunet_f1.yaml}
+  bifa: {LEVIR-CD: configs/p32_plugins/bifa_f1.yaml, DSIFN-CD: configs/p32_plugins/bifa_f1.yaml,
+         WHU-CD: configs/p32_plugins/bifa_f1.yaml}
+config_sha256:
+  configs/p32_plugins/snunet_f1.yaml: 77c566321db18363a51ead0e41d678762fa844e6bc66a91e088cffb00751004f
+  configs/p32_plugins/bifa_f1.yaml: f287ae3cb936346b703494a388f359a04d047c60ca495c7de6ccc5ed36be79dd

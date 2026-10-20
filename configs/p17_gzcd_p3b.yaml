@@ -1,0 +1,64 @@
+experiment:
+  name: p17_gzcd_dinov3_partial_ft
+  seed: 3407
+  output_root: outputs
+
+# Gate 1 of docs/P17_GZCD_SECOND_POSITIVE_PROTOCOL.md.
+# The P3b recipe is held fixed from LEVIR. The 512 px image geometry uses
+# the already established WHU batch-size recipe. The leakage-free
+# source-crop split from Gate -1 is mandatory.
+data:
+  dataset_root: /root/autodl-tmp/rs_cd_work/data/GZ-CD-tiles
+  manifest: manifests/datasets/gzcd.csv
+  train_split: train
+  val_split: val
+  test_split: test
+  train_crop_size: 256
+  eval_crop_size: null
+  num_workers: 8
+  prefetch_factor: 4
+  cache_mode: none
+  normalization: imagenet
+  # GZ-CD labels are 0/255.
+  mask_threshold: 127
+  train_flip: true
+  train_rotate90: true
+  positive_crop_probability: 0.7
+  positive_crop_min_pixels: 64
+  positive_crop_trials: 8
+
+model:
+  name: dinov3_convnext_cd
+  backbone_name: convnext_tiny.dinov3_lvd1689m
+  pretrained: true
+  checkpoint_path: /root/autodl-tmp/rs_cd_work/pretrained/DINOv3/convnext_tiny.dinov3_lvd1689m
+  freeze_backbone: false
+  trainable_stages: 2
+  decoder_channels: 128
+  in_channels: 3
+
+loss:
+  bce_weight: 1.0
+  dice_weight: 1.0
+  pos_weight: 2.0
+
+training:
+  epochs: 40
+  samples_per_epoch: 8192
+  batch_size: 32
+  learning_rate: 0.0003
+  backbone_learning_rate: 0.00002
+  weight_decay: 0.0001
+  amp: true
+  allow_tf32: true
+  deterministic: false
+  grad_clip_norm: 1.0
+  checkpoint_interval: 5
+  log_interval: 20
+  initial_checkpoint: null
+
+evaluation:
+  batch_size: 8
+  threshold: 0.5
+  validation_interval: 5
+  save_predictions: false

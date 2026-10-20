@@ -1,0 +1,15 @@
+# Evaluation protocol for the matched-image-size attribution control.
+# Byte-for-byte the same scenario specification as
+# configs/p8_whu_eval_protocol.yaml so that the ONLY difference between
+# the reference and target measurements is the dataset and the
+# --image-size flag passed on the command line.
+seed: 3407
+validation_split: val
+batch_size: 8
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]

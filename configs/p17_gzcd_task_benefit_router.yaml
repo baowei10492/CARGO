@@ -1,0 +1,38 @@
+# Gate 2 stage three for GZ-CD: collect task-benefit features and fit
+# the benefit router that P7-3 consumes. Recipe copied verbatim from
+# the LEVIR P7-2 protocol; nothing is tuned for GZ-CD.
+seed: 3407
+train_split: train
+validation_split: val
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]
+
+partition:
+  calibration_fraction: 0.20
+
+router:
+  hidden_dims: [32, 16]
+  dropout: 0.10
+  epochs: 300
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.001
+  huber_beta: 0.02
+  clean_sample_weight: 2.0
+  magnitude_weight_scale: 0.05
+  magnitude_weight_cap: 4.0
+  threshold_floor: 0.0
+  threshold_epsilon: 0.000001
+
+gates:
+  clean_f1_drop_max: 0.001
+  shift_mean_f1_gain_min: 0.020
+  shift8_f1_gain_min: 0.050
+  shift8_oracle_recovery_min: 0.50
+  shift8_aligned_selection_rate_min: 0.50

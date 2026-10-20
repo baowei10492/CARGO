@@ -1,0 +1,39 @@
+# P9-B: perturbations the deployed router structurally cannot represent.
+# Same detector, same classifiers, same LEVIR val as P7-3; only the
+# perturbation family changes.
+seed: 3407
+validation_split: val
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+
+perturbations:
+  # 0.5 / 1.0 / 3.0 px. The localizer decodes onto a 2 px grid, so the
+  # first two are below its representable resolution by construction.
+  - name: subpixel_shift
+    mode: t2
+    severities: [1, 2, 3]
+  # 0.25 / 0.5 / 1.0 degrees -> about 3.2 / 6.3 / 12.6 px corner
+  # displacement at 1024 px, bracketing the 2/4/8 px translation range.
+  # No single translation can correct a rotation.
+  - name: rotate
+    mode: t2
+    severities: [1, 2, 3]
+
+# Phase correlation WITH parabolic sub-pixel refinement. Without it the
+# classical baseline would be handicapped on exactly the axis where it
+# has a structural advantage over a 2 px decoding grid.
+include_phase_baseline: true
+gate_pixels: 1.0
+
+primary_method: safe_veto_task
+
+# The claim under test is graceful degradation, not correction. 0.005 is
+# five times the clean-drop budget used throughout P7-3 (0.001), because
+# these perturbations move the operating point far more than clean does;
+# it is declared here, before the run, and is not to be relaxed after.
+harm_tolerance: 0.005

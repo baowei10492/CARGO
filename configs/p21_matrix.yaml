@@ -1,0 +1,76 @@
+# P21 matrix, protocol amendment A (docs/P21_DETECTOR_AGNOSTIC_PROTOCOL.md
+# section 9). scripts/run_p21_cell.sh reads every cell-specific input from
+# this file; nothing cell-specific is hard-coded in the script.
+status: preregistered
+protocol_doc: docs/P21_DETECTOR_AGNOSTIC_PROTOCOL.md
+amendment: A
+stage1_config_pattern: configs/p21/{detector}_{dataset}.yaml
+guard_tolerance: 0.03
+
+detectors:
+  BIT:
+    slug: bit
+    levir_guard:
+      kind: published
+      value: 0.8931
+      source: >
+        Chen et al., TGRS 2021, LEVIR-CD F1 89.31 (same value in CDXLSTM,
+        arXiv 2411.07863, Table I).
+  CD-Lamba:
+    slug: cdlamba
+    levir_guard:
+      kind: relative
+      reference_detector: bit
+      source: >
+        CD-Lamba (arXiv 2501.15455) reports WHU-CD, SYSU-CD, DSIFN-CD and
+        CLCD only, and no third-party LEVIR-CD value was found. The guard is
+        F1 >= (BIT LEVIR-CD cell F1) - tolerance, which only catches a grossly
+        broken port (amendment A, 9.5).
+  CDxLSTM:
+    slug: cdxlstm
+    levir_guard:
+      kind: published
+      value: 0.9089
+      source: CDXLSTM, arXiv 2411.07863, Table I, LEVIR-CD F1 90.89.
+
+datasets:
+  LEVIR-CD:
+    slug: levir
+    dataset_root: /root/autodl-tmp/rs_cd_work/data/LEVIR-CD
+    manifest: manifests/datasets/levir_cd.csv
+    oracle_protocol: configs/p5b_oracle_t2_shift.yaml
+    router_protocol: configs/p7_task_benefit_router.yaml
+    classifier_protocol: configs/p7_safe_alignment_classifier.yaml
+    instrument_guard: levir
+    localizer:
+      pointer: reports/p7c_fullres_calibration_levir/LATEST
+      file: CHECKPOINT
+      require_files: []
+  DSIFN-CD:
+    slug: dsifn
+    dataset_root: /root/autodl-tmp/rs_cd_work/data/DSIFN-CD/DSIFN
+    manifest: manifests/datasets/dsifn_cd_source_split.csv
+    oracle_protocol: configs/p15_dsifn_oracle_t2_shift.yaml
+    router_protocol: configs/p7_task_benefit_router.yaml
+    classifier_protocol: configs/p7_safe_alignment_classifier.yaml
+    instrument_guard: inherit_levir
+    # No DSIFN-adapted localizer was ever trained (P15 stopped at Gate 1).
+    localizer:
+      pointer: reports/p7c_fullres_calibration_levir/LATEST
+      file: CHECKPOINT
+      require_files: []
+  GZ-CD:
+    slug: gzcd
+    dataset_root: /root/autodl-tmp/rs_cd_work/data/GZ-CD-tiles
+    manifest: manifests/datasets/gzcd.csv
+    oracle_protocol: configs/p17_gzcd_oracle_t2_shift.yaml
+    router_protocol: configs/p17_gzcd_task_benefit_router.yaml
+    classifier_protocol: configs/p17_gzcd_safe_alignment_classifier.yaml
+    instrument_guard: inherit_levir
+    # The localizer the DINOv3 row used on GZ-CD. Only the warm-started
+    # rerun records its detector source; the voided first attempt (main
+    # record 122.2) does not, and a VOID.json is refused outright.
+    localizer:
+      pointer: reports/p17_gzcd_gate2/LATEST
+      file: P7_CHECKPOINT
+      require_files: [SOURCE_DETECTOR_CHECKPOINT]

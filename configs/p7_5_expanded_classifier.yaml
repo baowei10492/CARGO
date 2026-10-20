@@ -1,0 +1,81 @@
+# P7-5: P7-3 safe-alignment classifier with the four tile-consistency
+# features that survived BOTH preregistered screening passes (pooled bar
+# 0.62388 AND the per-scenario rule of main record 69.2: within-clean
+# AND within-Shift-8 directional AUROC >= 0.60).
+#
+# Every value below except the three new blocks (tile_features,
+# improvement_gates, and this header) is byte-identical to the frozen
+# configs/p7_safe_alignment_classifier.yaml. That file itself is NOT
+# modified (prohibition #13).
+seed: 3407
+split_seed: 3407
+train_split: train
+validation_split: val
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]
+
+partition:
+  fit_fraction: 0.70
+  early_stop_fraction: 0.15
+
+label:
+  benefit_margin: 0.0
+
+weights:
+  magnitude_scale: 0.05
+  magnitude_floor: 0.05
+  magnitude_cap: 4.0
+  unsafe_weight: 3.0
+  clean_unsafe_extra_weight: 2.0
+
+classifier:
+  hidden_dims: [32, 16]
+  dropout: 0.10
+  max_epochs: 300
+  early_stop_patience: 60
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.001
+
+risk:
+  probability_floor: 0.5
+  threshold_epsilon: 0.000001
+  coverage_grid_points: 101
+
+gates:
+  clean_f1_drop_max: 0.001
+  shift_mean_f1_gain_min: 0.020
+  shift8_f1_gain_min: 0.050
+  shift8_oracle_recovery_min: 0.50
+
+primary_method: safe_veto_task
+
+# --- P7-5 additions (preregistered before the run) ------------------
+
+# The four survivors, in canonical order. tile_magnitude_spread passed
+# the pooled bar (0.698) but failed within-clean (0.517) and is
+# ablation-only per the 69.2 rule; tile_mean_offset_magnitude failed
+# both screens. Neither may be added here later.
+tile_features:
+  enabled: true
+  tile_size: 512
+  names:
+    - tile_max_pairwise_distance
+    - tile_dispersion_radius
+    - tile_agreement_within_2px
+    - tile_agreement_within_4px
+
+# Same-seed paired comparison against the recorded P7-3 seed-3407
+# baseline run (identical split salt -> identical fit/early-stop/risk
+# partition -> the ONLY change is the feature set). F1 is pixel-pooled
+# (~6.7e7 px), so 0.010 is far above pooled-metric noise; the shift-mean
+# guard rejects an expansion that buys S8 by hurting smaller shifts.
+improvement_gates:
+  shift8_gain_improvement_min: 0.010
+  shift_mean_gain_drop_max: 0.002

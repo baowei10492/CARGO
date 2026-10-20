@@ -1,0 +1,26 @@
+# P30 border-free comparison (docs/P30_BORDER_FREE_PROTOCOL.md). Written before any P30 run.
+status: preregistered
+protocol_doc: docs/P30_BORDER_FREE_PROTOCOL.md
+evaluation_config: configs/p27_eval_perturbation.yaml     # levels, ranges, per-crop draws, datasets
+evaluation_config_sha256: 64fd0aed61580f1dd0b35d3f491a0db19335c98cf94735347c8e9a42cf7e99fa
+selector_config: configs/p27_selector.yaml                 # selector recipe, unchanged
+selector_config_sha256: cd37272732448ebe88d42b6feb3d28b7e45f0f19db72dd28763e0d3d80dab509
+crop_margin: 64            # validation, test and selector-training crops keep 64 real pixels to the tile edge
+
+localizers:
+  p30: {pointer: outputs/p30_localizer/LATEST}              # version 2, border-free training
+  p27: {run: outputs/p27_localizer/20260916T164212Z}        # version 1, frozen (reference row)
+p27_selector_bundles: {pointer: reports/p27_localizer/selector/train/LATEST}
+
+detectors:
+  original: {config: configs/p27_f1_gate.yaml, sha256: c15fc4c4e45c6fb87d66000fa5406071c4947a652051937db3785aec8c0702d2}
+  p29_augmented: {config: configs/p27_plugins/dinov3aug_f1.yaml, sha256: c1f7a7995207091861260810068249f0897195f8277cccc737eb7ed0443190a9}
+  p30_augmented:
+    LEVIR-CD: {checkpoint_pointer: outputs/p30_aug_detectors/levir/CHECKPOINT}
+    DSIFN-CD: {checkpoint_pointer: outputs/p30_aug_detectors/dsifn/CHECKPOINT}
+    WHU-CD: {checkpoint_pointer: outputs/p30_aug_detectors/whu/CHECKPOINT}
+
+# Rows reported on validation and on the test split (once):
+#   1 original detector, no correction          2 P29 augmented detector, no correction
+#   3 P30 augmented detector, no correction     4 proposed: original detector + P30 localizer + P30 selector
+#   5 reference: original detector + P27 localizer + P27 selector (frozen)

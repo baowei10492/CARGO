@@ -1,0 +1,30 @@
+# P29 augmentation baseline as a P27 plug-in row: the DINOv3 detectors retrained with
+# test-matched misalignment augmentation (configs/p29/dinov3_aug_*.yaml), on all three
+# datasets. scripts/run_p29_aug_baseline.sh trains them and writes the pointer files.
+# Rules as configs/p27_f1_gate.yaml.
+status: preregistered
+protocol_doc: docs/P29_AUGMENTATION_BASELINE.md
+evaluation_config: configs/p27_eval_perturbation.yaml
+evaluation_config_sha256: 64fd0aed61580f1dd0b35d3f491a0db19335c98cf94735347c8e9a42cf7e99fa
+crops: all
+datasets:
+- LEVIR-CD
+- DSIFN-CD
+- WHU-CD
+detectors:
+  LEVIR-CD:
+    checkpoint_pointer: outputs/p29_aug_detectors/levir/CHECKPOINT
+  DSIFN-CD:
+    checkpoint_pointer: outputs/p29_aug_detectors/dsifn/CHECKPOINT
+  WHU-CD:
+    checkpoint_pointer: outputs/p29_aug_detectors/whu/CHECKPOINT
+marker_namespace: dinov3aug
+decision:
+  primary_path: estimated_gated
+  binding_levels:
+  - 2
+  - 3
+  min_gain: 0.0
+  max_clean_drop: 0.005
+instrument:
+  min_clean_raw_f1: 0.5

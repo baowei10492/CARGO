@@ -1,0 +1,76 @@
+# Gate 2 stage three for GZ-CD. Every threshold below is copied verbatim
+# from the LEVIR P7-3 protocol and must not be relaxed. Main record 120.4
+# establishes that shift_mean_f1_gain_min and shift8_f1_gain_min cannot be
+# reached on this dataset because the oracle ceiling is lower; the run
+# proceeds anyway so the captured fraction of that ceiling is measured
+# rather than derived.
+seed: 3407
+split_seed: 3407
+train_split: train
+validation_split: val
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]
+
+# ID-level three-way split. The remainder after fit and early-stop is the
+# risk-calibration split (0.15). The split is keyed by original sample ID
+# with a dedicated salt, so all scenario variants of one image share one
+# split, and it is independent of the retired P7-2 80/20 partition.
+partition:
+  fit_fraction: 0.70
+  early_stop_fraction: 0.15
+
+# safe label = aligned_loss_advantage > benefit_margin. The margin is
+# preregistered here, before any run, and must not be tuned afterwards.
+label:
+  benefit_margin: 0.0
+
+# Per-sample weight =
+#   clamp(|advantage| / magnitude_scale, magnitude_floor, magnitude_cap)
+#   * unsafe_weight                    (if label is unsafe)
+#   * clean_unsafe_extra_weight        (if additionally the row is clean)
+# This encodes the asymmetric cost of accepting a harmful alignment,
+# with clean harmful false-"safe" errors weighted highest.
+weights:
+  magnitude_scale: 0.05
+  magnitude_floor: 0.05
+  magnitude_cap: 4.0
+  unsafe_weight: 3.0
+  clean_unsafe_extra_weight: 2.0
+
+classifier:
+  hidden_dims: [32, 16]
+  dropout: 0.10
+  max_epochs: 300
+  early_stop_patience: 60
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.001
+
+# Deployment rule: align only when q gate fires AND
+# P(safe) >= probability_threshold. The threshold is computed only on the
+# risk-calibration split as
+#   max(probability_floor,
+#       max P(safe) over clean unsafe risk-calibration samples + epsilon)
+# so every clean harmful risk-calibration sample is vetoed by construction.
+risk:
+  probability_floor: 0.5
+  threshold_epsilon: 0.000001
+  coverage_grid_points: 101
+
+# Fixed validation gates, preregistered before the single validation run.
+# There is deliberately no aligned-selection-rate gate: selective routers
+# are judged on Oracle gain recovery and clean risk. Selection rates are
+# still reported. P7-2 keeps its historical "failed" status.
+gates:
+  clean_f1_drop_max: 0.001
+  shift_mean_f1_gain_min: 0.020
+  shift8_f1_gain_min: 0.050
+  shift8_oracle_recovery_min: 0.50
+
+primary_method: safe_veto_task

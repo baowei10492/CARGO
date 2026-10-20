@@ -1,0 +1,15 @@
+# Evaluation protocol for the native-resolution window probe.
+# Identical scenario specification to configs/p8_whu_eval_protocol.yaml so
+# the numbers stay comparable with the original scale probe. The only
+# change is batch_size 1: blocks reach 3072x3072 at native resolution, and
+# the correlation volume grows with the square of the window.
+seed: 3407
+validation_split: val
+batch_size: 1
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]

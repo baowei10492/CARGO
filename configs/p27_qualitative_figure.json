@@ -1,0 +1,6 @@
+[
+  {"dataset": "LEVIR-CD", "crop_id": "test_89|y0768x0512", "level": 3},
+  {"dataset": "DSIFN-CD", "crop_id": "test_45|y0000x0000", "level": 3},
+  {"dataset": "WHU-CD", "crop_id": "whu_test_r27c04|y0256x0256", "level": 3},
+  {"dataset": "LEVIR-CD", "crop_id": "test_74|y0256x0512", "level": 0}
+]

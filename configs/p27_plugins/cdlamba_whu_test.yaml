@@ -1,0 +1,6 @@
+# P27 plug-in row, CD-Lamba on WHU-CD: final test, once. Reporting only.
+status: preregistered
+selector_config: configs/p27_plugins/cdlamba_whu_selector.yaml
+selector_config_sha256: a644a066262e49a07897633ff831f941137266cb3c6e1328d58f3126e1bf3177
+split: test
+max_test_runs: 1

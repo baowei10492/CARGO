@@ -1,0 +1,6 @@
+# P29 augmentation baseline row: final test, once. Reporting only.
+status: preregistered
+selector_config: configs/p27_plugins/dinov3aug_selector.yaml
+selector_config_sha256: 143f8f03cc92a1e5504f254d19555758ee41d99f68237c8fcae47da60bb3d3c1
+split: test
+max_test_runs: 1

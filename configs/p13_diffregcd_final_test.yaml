@@ -1,0 +1,55 @@
+# Frozen after the P13 validation engineering audit and exact clean
+# reproduction of the public DiffRegCD LEVIR result. Test is reporting-only.
+status: frozen_external_test
+external_method: DiffRegCD
+external_commit: 6b9acb6c4476693916b00bf4a2e2eb37a5d0ed38
+split: test
+seed: 3407
+scenarios:
+  - {name: clean, severity: 0, mode: common}
+  - {name: shift, severity: 1, mode: t2, pixels: 2}
+  - {name: shift, severity: 2, mode: t2, pixels: 4}
+  - {name: shift, severity: 3, mode: t2, pixels: 8}
+input:
+  original_image_size: 1024
+  external_model_size: 256
+  tile_size: 256
+  tile_overlap: 0
+  tile_batch_size: 2
+  shift_before_tiling: true
+  normalization: minus_one_to_one
+  common_random_numbers_across_scenarios: true
+  temporal_mapping:
+    external_A_t1: project_image_t1
+    external_B_t0: project_image_t2
+weights:
+  backbone:
+    relative_path: checkpoints/I200000_E3_gen.pth
+    sha256: fc4482542ddadd704e6b8f95b6d6d778eb115001f89a4e988b3202fe6248b9f7
+  registration:
+    relative_path: checkpoints/levir/best_reg_model_gen.pth
+    sha256: af9c8241e971b5c16469eb36e815b02b8ca054e8af223b3842699bdf5b3912bc
+  change_detection:
+    relative_path: checkpoints/levir/best_cd_model_gen.pth
+    sha256: 842b3a83a764c26982fb93993ca30dce6e467fab3ccce247ebf7a3200cb38c02
+evaluation:
+  probability_threshold: 0.5
+  interior_border_pixels: 16
+  use_corruption_valid_mask: true
+  metrics:
+    - change_precision
+    - change_recall
+    - change_f1
+    - change_iou
+    - overall_accuracy
+    - mean_f1_author_compatibility
+  inference_paths:
+    - official_unmodified
+test_policy:
+  run_test: true
+  reporting_only_no_selection: true
+  allowed_runs: 1
+  selected_path_basis: >-
+    Public author test wiring reproduced the published clean change-F1 to
+    within 0.000025. The path was frozen without using shift performance.
+

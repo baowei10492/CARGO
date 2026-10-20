@@ -1,0 +1,44 @@
+# P27 F1 step: the frozen P27 localizer in front of the frozen DINOv3
+# detectors on every validation crop (docs/P27_F1_AMENDMENT.md).
+# Written after the P27 version 1 hold-out diagnosis (main record 192.5) and
+# before any P27 localizer met a validation crop. Nothing below may be
+# changed after a P27 F1 result has been seen.
+status: preregistered
+protocol_doc: docs/P27_F1_AMENDMENT.md
+
+# Crops, perturbations (P25 without rotation), localizer trigger, grid and
+# the one-use / two-version limit all come from the P27 evaluation config.
+evaluation_config: configs/p27_eval_perturbation.yaml
+evaluation_config_sha256: 64fd0aed61580f1dd0b35d3f491a0db19335c98cf94735347c8e9a42cf7e99fa
+
+# Every non-overlapping 256 px crop of every validation tile
+# (LEVIR 1024 px tiles: 16 crops; DSIFN and WHU 512 px tiles: 4 crops).
+crops: all
+
+# The DINOv3 detectors of the paper, frozen, not retrained.
+detectors:
+  LEVIR-CD:
+    source: P3b checkpoint used by P12
+    checkpoint: outputs/p3b_dinov3_convnext_tiny_partial_ft/20260724T151633Z_seed3407/checkpoints/best.pth
+    sha256: 3c8aaf7174ab43618e38bf51aaf0e889253a3905b0be0e1994a30fcbfbc82102
+  DSIFN-CD:
+    source: P15 Gate 1
+    checkpoint: outputs/p15_dsifn_dinov3_partial_ft/20260728T062235Z_seed3407/checkpoints/best.pth
+    sha256: c9b54ac938401de6689c082538edc2d938a7662fb00b8ebe1822bb4c627eab9e
+  WHU-CD:
+    source: P8 (the detector of P22 / P24)
+    checkpoint: outputs/p8_whu_dinov3_partial_ft/20260726T145452Z_seed3407/checkpoints/best.pth
+    sha256: null                 # not in the local records; the run records it
+
+decision:
+  # Paths: raw / oracle (true matrix) / estimated (always corrected) /
+  # estimated_gated (corrected only when sigmoid(misaligned_logit) > 0.5).
+  primary_path: estimated_gated
+  binding_levels: [2, 3]
+  min_gain: 0.0                  # F1(gated) - F1(raw) > 0 at every binding level
+  max_clean_drop: 0.005          # F1(raw, clean) - F1(gated, clean) <= 0.005
+
+instrument:
+  # Below this clean raw F1 the detector / crop pipeline is taken to be broken
+  # and no verdict is given. The clean oracle must also equal the clean raw path.
+  min_clean_raw_f1: 0.50

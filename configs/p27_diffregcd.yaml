@@ -1,0 +1,39 @@
+# DiffRegCD (WACV 2026) on the P27 affine protocol (docs/P27_EXPERIMENTS_AMENDMENT.md).
+# Official author inference with the released per-dataset heads, on the same
+# test crops, perturbations and scoring pixels as the P27 test runs.
+status: preregistered
+protocol_doc: docs/P27_EXPERIMENTS_AMENDMENT.md
+evaluation_config: configs/p27_eval_perturbation.yaml
+evaluation_config_sha256: 64fd0aed61580f1dd0b35d3f491a0db19335c98cf94735347c8e9a42cf7e99fa
+split: test
+seed: 3407                      # diffusion noise per crop, shared by its levels
+probability_threshold: 0.5      # softmax class 1, as in P13
+
+external:
+  root: /root/autodl-tmp/rs_cd_work/DiffRegCD
+  commit: 6b9acb6c4476693916b00bf4a2e2eb37a5d0ed38
+  backbone:
+    path: checkpoints/I200000_E3_gen.pth
+    sha256: fc4482542ddadd704e6b8f95b6d6d778eb115001f89a4e988b3202fe6248b9f7
+
+datasets:
+  LEVIR-CD:
+    config_json: config/levir_test.json
+    registration: {path: checkpoints/levir/best_reg_model_gen.pth,
+                   sha256: af9c8241e971b5c16469eb36e815b02b8ca054e8af223b3842699bdf5b3912bc}
+    change_detection: {path: checkpoints/levir/best_cd_model_gen.pth,
+                       sha256: 842b3a83a764c26982fb93993ca30dce6e467fab3ccce247ebf7a3200cb38c02}
+  DSIFN-CD:
+    config_json: config/dsifn_test.json
+    registration: {path: checkpoints/dsifn/best_reg_model_gen.pth,
+                   sha256: 73813dc0831231a9b1ab21f4245e18fae7fe7faf11fdee2a52a25248227dfc49}
+    change_detection: {path: checkpoints/dsifn/best_cd_model_gen.pth,
+                       sha256: ecc3468954399dc1dc850c97e55dfe70ed6e61037b69e6093a1e9537f1aff491}
+  WHU-CD:
+    # The released WHU head may have been trained on tiles that overlap this
+    # project's WHU test raster (their 256 px split is not documented); report with that note.
+    config_json: config/whu_test.json
+    registration: {path: checkpoints/whu/best_reg_model_gen.pth,
+                   sha256: a56bf90836c2964a674040f5ca6e367bb33e16b7940699254fd22e9565431e32}
+    change_detection: {path: checkpoints/whu/best_cd_model_gen.pth,
+                       sha256: 9e427ed3f4d83f8724df71ae0aa7f44cdb9eeec9c89a94e431885595e726935b}

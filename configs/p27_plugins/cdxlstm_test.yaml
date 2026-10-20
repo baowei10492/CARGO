@@ -1,0 +1,7 @@
+# P27 plug-in row, CDxLSTM: final test, once, with the selectors of this row
+# that went through the validation run. Reporting only.
+status: preregistered
+selector_config: configs/p27_plugins/cdxlstm_selector.yaml
+selector_config_sha256: 46d3cba46db550f9dc53c41e741cbdecb4a2bb6a02df2ad9843357ba11314ae4
+split: test
+max_test_runs: 1

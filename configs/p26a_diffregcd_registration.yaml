@@ -1,0 +1,51 @@
+# P26-A: amendment of P26 after the read-only flow diagnosis (main record 191.3).
+# Written before any P26-A run; docs/P26A_DIFFREGCD_INPUT_ORDER_AMENDMENT.md.
+# Nothing below may be changed after a P26-A result has been seen.
+status: preregistered
+protocol_doc: docs/P26A_DIFFREGCD_INPUT_ORDER_AMENDMENT.md
+gate: p26a_step1
+amends:
+  config: configs/p26_diffregcd_registration.yaml
+  sha256: d870b9a668b279ad7330d5ba86c2dd6e6de3e23c6f2169f9b600f2e17cf9e421
+  run: reports/p26_diffregcd/step1/20260916T155016Z
+
+p25_config: configs/p25_affine_protocol.yaml
+p25_config_sha256: 561b7d292af49b263710142b1b83966425d516e2e49fcf0bfab0480eadba70ef
+datasets: [LEVIR-CD, DSIFN-CD]
+
+# The two changes of the amendment:
+input_order: A_reference      # author A = unperturbed T1, author B = perturbed T2
+perturbation_target: t2       # identical to P25 (RoMa), so the rows compare directly
+
+external:
+  root: /root/autodl-tmp/rs_cd_work/DiffRegCD
+  commit: 6b9acb6c4476693916b00bf4a2e2eb37a5d0ed38
+  feature_timestep: 50
+  feature_level: 11
+  backbone:
+    path: checkpoints/I200000_E3_gen.pth
+    sha256: fc4482542ddadd704e6b8f95b6d6d778eb115001f89a4e988b3202fe6248b9f7
+  registration_heads:
+    LEVIR-CD:
+      path: checkpoints/levir/best_reg_model_gen.pth
+      sha256: af9c8241e971b5c16469eb36e815b02b8ca054e8af223b3842699bdf5b3912bc
+      config_json: config/levir_test.json
+    DSIFN-CD:
+      path: checkpoints/dsifn/best_reg_model_gen.pth
+      sha256: 73813dc0831231a9b1ab21f4245e18fae7fe7faf11fdee2a52a25248227dfc49
+      config_json: config/dsifn_test.json
+
+fit:
+  reprojection_px: 2.0
+  max_iters: 2000
+  confidence: 0.999
+  refine_iters: 10
+  min_inliers: 8
+trigger_mean_displacement_px: 4.0
+
+selfcheck:
+  tolerance_px: 2.0
+  ambiguity_ratio: 0.5
+  # Unambiguous but imprecise: still measure, reported as a description
+  # (verdict selfcheck_imprecise, never a pass). Ambiguous: stop.
+  continue_when_imprecise: true

@@ -1,0 +1,87 @@
+# P33 ablation (docs/P33_REVIEWER_EXPERIMENTS.md): configs/p30_localizer_v2.yaml retrained without change supervision.
+# The change head and the weights w = c * sigmoid(-z) are kept, but z is learned only through the geometric losses
+# (loss.weights.change: 0.0); the synthetic pasted changes are still in the images. Everything else, including the
+# seed and the hold-out used for checkpoint selection, is unchanged.
+seed: 3407
+log_every: 50
+eval_every: 2500
+
+sources:
+  - {name: LEVIR-CD, dataset_root: /root/autodl-tmp/rs_cd_work/data/LEVIR-CD,
+     manifest: manifests/datasets/levir_cd.csv, tile_size: 1024, mask_threshold: 127}
+  - {name: DSIFN-CD, dataset_root: /root/autodl-tmp/rs_cd_work/data/DSIFN-CD/DSIFN,
+     manifest: manifests/datasets/dsifn_cd_source_split.csv, tile_size: 512, mask_threshold: 0}
+  - {name: WHU-CD, dataset_root: /root/autodl-tmp/rs_cd_work/data/WHU-CD,
+     manifest: manifests/datasets/whu_cd.csv, tile_size: 512, mask_threshold: 127}
+  - {name: GZ-CD, dataset_root: /root/autodl-tmp/rs_cd_work/data/GZ-CD-tiles,
+     manifest: manifests/datasets/gzcd.csv, tile_size: 512, mask_threshold: 127}
+
+holdout:
+  fraction: 0.05
+  crops_per_source: 150
+  border_free_margin: 64
+  evaluation:
+    levels: [1, 2, 3]
+    max_translation_px: 25.0
+    scale_range: [0.80, 1.25]
+    grid_points: 17
+    success_ate_px: 2.0
+    tracking_rate_min: 0.80
+    binding_levels: [2, 3]
+    clean_trigger_max: 0.10
+    trigger_probability: 0.5
+
+data:
+  crop_size: 256
+  border_free_margin: 96
+  num_workers: 8
+  perturbation:
+    identity: 0.3
+    small: 0.2
+    small_translation: 3.0
+    small_scale: 0.01
+    large_translation: 32.0
+    large_scale: [0.75, 1.333]
+    rotation: 0.0
+  synthetic_change:
+    probability: 0.5
+    max_fraction: 0.4
+    max_patches: 6
+    min_size: 16
+    max_size: 96
+  photometric:
+    brightness: 0.15
+    contrast: [0.8, 1.2]
+    channel_gain: [0.9, 1.1]
+    gamma: [0.8, 1.25]
+    blur_probability: 0.2
+    blur_sigma: [0.3, 1.2]
+    noise_probability: 0.3
+    noise_sigma: 0.03
+
+model:
+  checkpoint_dir: /root/autodl-tmp/rs_cd_work/pretrained/DINOv3/convnext_tiny.dinov3_lvd1689m
+  coarse_dim: 128
+  fine_dim: 64
+  initial_temperature: 0.05
+  coarse_window: 1
+  fine_radius: 3
+  fine_iterations: 2
+  irls_iterations: 3
+  coarse_huber_px: 8.0
+  fine_huber_px: 2.0
+  misalignment_grid: 9
+
+loss:
+  grid: 9
+  stage_weights: [0.5, 0.75, 1.0]
+  weights: {relative: 1.0, absolute: 0.2, self: 1.0, change: 0.0, misaligned: 0.1}
+
+optim:
+  steps: 50000
+  batch_size: 16
+  lr: 0.0003
+  weight_decay: 0.01
+  warmup_steps: 1000
+  grad_clip: 1.0
+  amp: true

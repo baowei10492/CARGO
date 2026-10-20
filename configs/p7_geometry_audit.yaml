@@ -1,0 +1,15 @@
+name: p7_geometry_audit_v1
+seed: 3407
+tensor_height: 127
+tensor_width: 131
+translations:
+  - [2, 0]
+  - [-2, 0]
+  - [0, 4]
+  - [0, -4]
+  - [8, 8]
+  - [-8, -8]
+max_abs_shift: 12
+identity_max_abs_tolerance: 1.0e-6
+recovery_max_abs_tolerance: 2.0e-5
+feature_probe_image_size: 256

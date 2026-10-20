@@ -1,0 +1,80 @@
+# P32 stage 1: BiFA on DSIFN-CD (docs/P32_PLUGIN_EXTENSION.md).
+#
+# Data: identical to the DINOv3 row on this dataset (configs/p15_dsifn_p3b.yaml), so every
+# detector sees the same split, crops and positive-crop sampling.
+# Optimisation: the detector's published optimizer and schedule, rescaled to
+# this project's 40 x 8192 sample budget by keeping the schedule's shape
+# (P21 protocol amendment A). Source: BiFA config/levir.json (Adam 1e-4, linear decay,
+# 200 epochs, batch 8, 256 crops). The published recipe sets no weight decay, so AdamW
+# with weight_decay 0 is Adam exactly; this project has no separate 'adam' option.
+# Loss: BCE + Dice for every detector (project protocol, not the published
+# loss). Only the nn.Module is imported from the BiFA checkout
+# (src/rs_cd/models/external_bifa.py).
+status: preregistered
+protocol_doc: docs/P32_PLUGIN_EXTENSION.md
+cell: {detector: BiFA, dataset: DSIFN-CD}
+
+experiment:
+  name: p32_bifa_dsifn
+  seed: 3407
+  output_root: outputs
+
+data:
+  dataset_root: /root/autodl-tmp/rs_cd_work/data/DSIFN-CD/DSIFN
+  manifest: manifests/datasets/dsifn_cd_source_split.csv
+  train_split: train
+  val_split: val
+  test_split: test
+  train_crop_size: 256
+  eval_crop_size: null
+  num_workers: 8
+  prefetch_factor: 4
+  cache_mode: none
+  normalization: imagenet
+  # DSIFN-CD masks are encoded as 0/1, not 0/255.
+  mask_threshold: 0
+  train_flip: true
+  train_rotate90: true
+  positive_crop_probability: 0.7
+  positive_crop_min_pixels: 64
+  positive_crop_trials: 8
+
+model:
+  name: bifa_detector
+  detector_name: BiFA
+  repo_root: /root/autodl-tmp/rs_cd_work/BiFA
+  backbone: mit_b0
+  # ImageNet weights in the original SegFormer naming, written by
+  # tools/p32_convert_mit_b0.py from the public nvidia/mit-b0 checkpoint.
+  pretrained_backbone: external/mit_b0_imagenet.pth
+  # BiFA trains on 256-pixel crops and its backbone attends at stride 4;
+  # every evaluation forward runs on non-overlapping 256-pixel tiles.
+  inference_tile_size: 256
+
+loss:
+  bce_weight: 1.0
+  dice_weight: 1.0
+  pos_weight: 2.0
+
+training:
+  epochs: 40
+  samples_per_epoch: 8192
+  batch_size: 8                  # published batch; only memory may lower it
+  optimizer: adamw
+  learning_rate: 0.0001
+  backbone_learning_rate: null   # one learning rate for all parameters
+  weight_decay: 0.0              # published recipe is Adam, i.e. no decay
+  scheduler: linear
+  amp: true
+  allow_tf32: true
+  deterministic: false
+  grad_clip_norm: null           # no clipping in the published recipes
+  checkpoint_interval: 5
+  log_interval: 20
+  initial_checkpoint: null
+
+evaluation:
+  batch_size: 2
+  threshold: 0.5
+  validation_interval: 5
+  save_predictions: false

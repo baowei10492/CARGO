@@ -1,0 +1,4 @@
+"""Remote-sensing change detection research package."""
+
+__version__ = "0.1.0"
+

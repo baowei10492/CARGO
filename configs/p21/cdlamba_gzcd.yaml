@@ -1,0 +1,78 @@
+# P21 stage 1: CD-Lamba on GZ-CD.
+#
+# Data: identical to the DINOv3 row on this dataset (configs/p17_gzcd_p3b.yaml), so every
+# detector sees the same split, crops and positive-crop sampling.
+# Optimisation: the detector's published optimizer and schedule, rescaled to
+# this project's 40 x 8192 sample budget by keeping the schedule's shape
+# (protocol amendment A). Source: rschange configs/cdlamba.py (SGD 0.01, momentum 0.9, wd 5e-4, Poly 0.9, lr_mode single).
+# Loss: BCE + Dice for every detector (project protocol, not the published
+# loss). Only the nn.Module is imported from rschange.
+status: preregistered
+protocol_doc: docs/P21_DETECTOR_AGNOSTIC_PROTOCOL.md
+cell: {detector: CD-Lamba, dataset: GZ-CD}
+
+experiment:
+  name: p21_cdlamba_gzcd
+  seed: 3407
+  output_root: outputs
+
+data:
+  dataset_root: /root/autodl-tmp/rs_cd_work/data/GZ-CD-tiles
+  manifest: manifests/datasets/gzcd.csv
+  train_split: train
+  val_split: val
+  test_split: test
+  train_crop_size: 256
+  eval_crop_size: null
+  num_workers: 8
+  prefetch_factor: 4
+  cache_mode: none
+  normalization: imagenet
+  # GZ-CD labels are 0/255.
+  mask_threshold: 127
+  train_flip: true
+  train_rotate90: true
+  positive_crop_probability: 0.7
+  positive_crop_min_pixels: 64
+  positive_crop_trials: 8
+
+model:
+  name: rschange_detector
+  detector_name: CD-Lamba
+  repo_root: /root/autodl-tmp/rs_cd_work/rschange
+  backbone:
+    type: cdlamba
+    channels: [64, 128, 192, 256]
+  decoderhead:
+    type: changedetector
+    in_channel: 640       # (64 + 128 + 192 + 256), two-class output
+
+loss:
+  bce_weight: 1.0
+  dice_weight: 1.0
+  pos_weight: 2.0
+
+training:
+  epochs: 40
+  samples_per_epoch: 8192
+  batch_size: 8                  # published batch; only memory may lower it
+  optimizer: sgd
+  learning_rate: 0.01
+  backbone_learning_rate: null   # lr_mode single
+  momentum: 0.9
+  weight_decay: 0.0005
+  scheduler: poly
+  poly_power: 0.9
+  amp: true
+  allow_tf32: true
+  deterministic: false
+  grad_clip_norm: null           # no clipping in the published recipes
+  checkpoint_interval: 5
+  log_interval: 20
+  initial_checkpoint: null
+
+evaluation:
+  batch_size: 8
+  threshold: 0.5
+  validation_interval: 5
+  save_predictions: false

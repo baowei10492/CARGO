@@ -1,0 +1,16 @@
+# Evaluation protocol for the WHU localizer stage-A diagnostics.
+# Identical scenario specification to the Stage C / C2b protocol so the
+# conditional PCK numbers are directly comparable across datasets.
+# maximum_offset_pixels stays 8.0 because search_radius is 4 (+-8 px):
+# boundary_fraction must be measured against the actual searchable
+# domain, otherwise clamping pseudo-hits go undetected (main record 63.3).
+seed: 3407
+validation_split: val
+batch_size: 8
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]

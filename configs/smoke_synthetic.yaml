@@ -1,0 +1,44 @@
+experiment:
+  name: smoke_fc_siam_diff
+  seed: 3407
+  output_root: outputs
+
+data:
+  dataset_root: data/synthetic
+  manifest: manifests/datasets/synthetic.csv
+  train_split: train
+  val_split: val
+  test_split: test
+  train_crop_size: 64
+  eval_crop_size: 64
+  num_workers: 0
+  prefetch_factor: 2
+  cache_mode: none
+  normalization: unit
+  mask_threshold: 127
+  train_flip: false
+  train_rotate90: false
+
+model:
+  name: fc_siam_diff
+  in_channels: 3
+  base_channels: 8
+
+loss:
+  bce_weight: 1.0
+  dice_weight: 1.0
+  pos_weight: null
+
+training:
+  epochs: 100
+  batch_size: 4
+  learning_rate: 0.01
+  weight_decay: 0.0
+  amp: false
+  grad_clip_norm: 1.0
+  log_interval: 1
+
+evaluation:
+  batch_size: 2
+  threshold: 0.5
+  save_predictions: true

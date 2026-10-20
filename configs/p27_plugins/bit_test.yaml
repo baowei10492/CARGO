@@ -1,0 +1,7 @@
+# P27 plug-in row, BIT: final test, once, with the selectors of this row
+# that went through the validation run. Reporting only.
+status: preregistered
+selector_config: configs/p27_plugins/bit_selector.yaml
+selector_config_sha256: 35330309e59817f0cb022c325f89b9b24ba559a599026425ddae6c7616b9d1b5
+split: test
+max_test_runs: 1

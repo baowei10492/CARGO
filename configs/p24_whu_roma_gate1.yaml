@@ -1,0 +1,29 @@
+# P24: WHU-CD Gate 1 with RoMa, written after the P23 screen stopped and
+# after the read-only diagnosis of that screen (main records 188-188.2).
+# docs/P24_WHU_ROMA_GATE1_PROTOCOL.md. Nothing below may be changed after a
+# P24 result has been seen.
+status: preregistered
+protocol_doc: docs/P24_WHU_ROMA_GATE1_PROTOCOL.md
+
+# RoMa settings, estimation rules and seed come from P23 unchanged; rasters,
+# windows, shifts, detector, P7C and the Gate 1 thresholds come from P22
+# through it. Both digests are checked.
+p23_config: configs/p23_whu_strong_localizer.yaml
+p23_config_sha256: b15ef2ee2a83b2de2fc87d286ba66456a645b246231844b923c0e8745a47ad7f
+
+# The P23 screen this protocol follows; the tool refuses any other.
+p23_screen_run: 20260916T133941Z
+p23_screen_verdict: stop_no_candidate_tracks
+
+selected: roma_outdoor
+
+gate1:
+  # The four P7C paths must reproduce the P22 Gate 1 F1 table.
+  anchor_tolerance: 0.0001
+  # Verdict: P22 gate1 raw_damage_min 0.05 / headroom_min 0.05 / recovery_min 0.50.
+  # Descriptive only: the same table per band of validation rows
+  # (main record 188.2 located the localizer failures in rows 11-21).
+  row_groups:
+    - ["rows 00-10", 0, 10]
+    - ["rows 11-21", 11, 21]
+    - ["rows 22-28", 22, 28]

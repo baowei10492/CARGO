@@ -1,0 +1,19 @@
+name: p4_robustness_diagnostic_v1
+seed: 3407
+batch_size: 4
+num_workers: 8
+prefetch_factor: 2
+
+corruptions:
+  - name: shift
+    severities: [1, 2, 3]
+    modes: [t1, t2, common]
+  - name: brightness
+    severities: [1, 2, 3]
+    modes: [t1, t2, common]
+  - name: gaussian_blur
+    severities: [1, 2, 3]
+    modes: [t1, t2, common]
+  - name: gaussian_noise
+    severities: [1, 2, 3]
+    modes: [t1, t2, common]

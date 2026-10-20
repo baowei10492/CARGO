@@ -1,0 +1,6 @@
+# P27 plug-in row, CDxLSTM on WHU-CD: final test, once. Reporting only.
+status: preregistered
+selector_config: configs/p27_plugins/cdxlstm_whu_selector.yaml
+selector_config_sha256: 6c7d8e91479b6b7f5c61c08352dda5309412faddef94e51c8defa0eb81a60229
+split: test
+max_test_runs: 1

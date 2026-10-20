@@ -1,0 +1,44 @@
+# P27 plug-in row, BIT on WHU-CD: selector step. Recipe as configs/p27_selector.yaml.
+status: preregistered
+protocol_doc: docs/P27_EXPERIMENTS_AMENDMENT.md
+seed: 3407
+f1_config: configs/p27_plugins/bit_whu_f1.yaml
+f1_config_sha256: f786dbc7e3b9d600c6560144054da4ce45d8d2697847c81bb35eda5aa05a64e9
+f1_reference_decision: reports/p27_localizer/plugins/bit_whu/f1/LATEST
+anchor_tolerance: 0.001
+localizer_run: outputs/p27_localizer/20260916T164212Z
+localizer_checkpoint: best.pth
+training_crops:
+  split: train
+  max_fit_crops_per_dataset: 3000
+  early_stop_fraction: 0.15
+label:
+  benefit_margin: 0.0
+weights:
+  magnitude_scale: 0.05
+  magnitude_floor: 0.05
+  magnitude_cap: 4.0
+  unsafe_weight: 3.0
+  clean_unsafe_extra_weight: 2.0
+classifier:
+  hidden_dims:
+  - 32
+  - 16
+  dropout: 0.1
+  max_epochs: 300
+  early_stop_patience: 60
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.001
+risk:
+  probability_floor: 0.5
+  threshold_epsilon: 1.0e-06
+  coverage_grid_points: 101
+calibration:
+  clean_drop_target: 0.0025
+  tau_grid_start: 0.5
+  tau_grid_stop: 1.0
+  tau_grid_step: 0.01
+evaluation:
+  primary_path: selector
+  max_selector_versions: 1

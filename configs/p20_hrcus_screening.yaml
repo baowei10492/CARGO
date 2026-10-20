@@ -1,0 +1,92 @@
+status: preregistered
+dataset: HRCUS-CD
+protocol_doc: docs/P20_HRCUS_SECOND_POSITIVE_PROTOCOL.md
+
+# Gate 0 is label-free and runs entirely on frozen LEVIR checkpoints.
+# It reads no change label, trains nothing, and never touches any test
+# split. The HRCUS-CD test split is not even present on the server.
+geometry:
+  # HRCUS-CD ships as 256x256 tiles and cannot be re-tiled larger, so the
+  # hygiene diagnostic must cut 128 px tiles to have more than one tile
+  # per image, and the matched control must centre-crop LEVIR to 256 with
+  # the same 128 px tile. Absolute dispersion is NOT comparable across
+  # geometries (main record 26: LEVIR D moves from 0.000 at 1024/512 to
+  # 7.606 at 512/256), which is why the gate reads excess over the
+  # matched control rather than an absolute value.
+  candidate_split: val
+  control_split: val
+  control_center_crop: 256
+  tile_size: 128
+  severities: [0, 1, 2, 3]
+
+  # Second control at the geometry where the published LEVIR number
+  # exists. This is an instrument check before anything else is read:
+  # if it does not reproduce, the run is invalid (main record 85).
+  reference_center_crop: 512
+  reference_tile_size: 256
+  reference_clean_q_expected: 0.0625
+  reference_clean_q_tolerance: 0.02
+
+gate0:
+  # Excess over the geometry-matched LEVIR control, in pixels.
+  dispersion_excess_green_max: 1.0
+  dispersion_excess_red_min: 3.0
+  # Absolute clean q trigger rate. These values were calibrated at 512
+  # geometry (LEVIR@512 0.0625 in domain, WHU@512 0.4138 out of domain,
+  # S2Looking@1024 0.672 true negative) and are carried over UNCHANGED.
+  clean_q_green_max: 0.15
+  clean_q_red_min: 0.40
+  # Preregistered scale caveat. Twice now an absolute threshold has been
+  # applied outside the scale it was calibrated on (main record 120.6 for
+  # the Gate 2 F1 gains, 126.10.3 for the P19 scan range). If the matched
+  # LEVIR control at 256/128 geometry itself exceeds clean_q_green_max,
+  # then this absolute number has left its calibration range on this
+  # geometry and the branch must be read as ambiguous rather than red.
+  # That is an application of the existing rule in main record 71
+  # (ambiguity routes to the decisive criterion), not a new leniency.
+  absolute_clean_q_invalid_if_control_exceeds_green: true
+  # Both signals must be red to stop; anything else routes to the
+  # decisive criterion.
+  stop_requires_both_signals_red: true
+
+gate1:
+  shift8_input_oracle_headroom_min: 0.05
+
+gate2:
+  clean_f1_drop_max: 0.001
+  shift_mean_gain_min: 0.020
+  shift8_gain_min: 0.050
+  shift8_oracle_recovery_min: 0.50
+
+gate3:
+  allowed_reruns: 0
+  reporting_only_no_selection: true
+  scenarios: [clean, shift2, shift4, shift8]
+  probability_threshold: 0.5
+  interior_border_pixels: 16
+  # The test split is deliberately absent from the server. Before Gate 3
+  # may run it must be uploaded AND the cross-split leakage audit re-run
+  # with all three splits, because Gate -1 could only compare train/val.
+  requires_leakage_audit_including_test: true
+
+reporting:
+  # AERNet documents 0.5 m GSD. The dataset's geographic location is not
+  # taken from secondary sources: one popular listing labels HRCUS-CD as
+  # Egyptian, which conflicts with the authors' affiliation. Report it as
+  # unknown unless the paper states it.
+  gsd_meters: 0.5
+  units: pixels
+  location: unverified
+
+# Values measured locally before upload, from val labels only, using the
+# frozen shift primitives. Gate -1 must reproduce them on the server.
+preflight_expectations:
+  val_self_iou_at_8: 0.6683
+  val_self_iou_tolerance: 0.002
+  # Computed with scipy 8-connectivity because cv2 was unavailable
+  # locally. The frozen auditor uses cv2 connectivity=8, which should be
+  # identical; the wider tolerance reflects that this equivalence has not
+  # been verified, not measurement noise.
+  val_area_weighted_median_diameter_px: 92.9
+  val_diameter_tolerance_px: 1.0
+  val_change_fraction: 0.0223

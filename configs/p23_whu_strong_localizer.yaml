@@ -1,0 +1,59 @@
+# P23: WHU-CD with published localizers in place of the frozen LEVIR P7C.
+# Written before any P23 run; docs/P23_WHU_STRONG_LOCALIZER_PROTOCOL.md.
+# Nothing below may be changed after a P23 result has been seen.
+status: preregistered
+protocol_doc: docs/P23_WHU_STRONG_LOCALIZER_PROTOCOL.md
+seed: 3407
+
+# Rasters, windows, shift families, detector, P7C checkpoint and the Gate 1
+# thresholds are inherited verbatim from P22; the tool refuses a P22 config
+# whose digest differs from this one.
+p22_config: configs/p22_whu_physical_shift.yaml
+p22_config_sha256: d00a12b8cc55bfe524782f5d171a7d764d8cb8da447d1f6c24672ac698adf694
+
+estimation:
+  # One search prior for every generic candidate: twice the largest injected
+  # shift (48 px). P7C keeps its architectural +-48 px domain.
+  max_abs_shift_native_px: 96
+  # Translation consensus (deterministic exhaustive RANSAC), working pixels.
+  consensus_threshold_working_px: 1.0
+  min_matches: 8
+  # Zero-shift decision for generic candidates: |offset| > 6 native px
+  # (one P7C coarse pixel, the P22 Gate 0 clean tolerance). P7C keeps its q gate.
+  trigger_threshold_native_px: 6.0
+  # Warp with the nearest integer offset (integer shifts stay exact).
+  round_to_integer_px: true
+
+# Frozen candidate list. Working factor divides the 3072 px window.
+# Revised before any P23 run (2026-09-16, user decision): RoMa is the single
+# pre-specified strong localizer. If it does not track, P23 stops; trying any
+# other matcher needs a new, disclosed protocol.
+# use_custom_corr: true selects RoMa's fused local-correlation kernel, pinned
+# to fused-local-corr 0.1.1 (the build for torch 2.5.1). Every RoMa result of
+# this line uses this kernel; the tool stops if it is missing or differs
+# (main records 187.2-187.4). Set before any estimate was produced.
+candidates:
+  - {name: p7c, kind: p7c, role: reference}
+  - {name: roma_outdoor, kind: roma_outdoor, working_factor: 3, num_matches: 5000,
+     use_custom_corr: true, fused_local_corr_version: "0.1.1"}
+
+selfcheck:
+  # A train window against itself shifted by a known amount: sign, unit and
+  # scale of every generic candidate. P7C is checked by the offsets anchor.
+  blocks: 3
+  shifts: [[24, -24], [-48, 12], [0, 0]]
+  tolerance_native_px: 1.5
+
+screen:
+  # P7C rows must reproduce P22 gate0_offsets.csv and gate1_offsets.csv.
+  anchor_tolerance_px: 0.0001
+  # Verdict on the 174 validation tiles, physical family (12/24/48 px):
+  tracking_pck2_min: 0.80        # native PCK@2 at every physical severity
+  clean_trigger_max: 0.10        # reported and used for ranking; never stops
+  ranking_margin: 0.02           # mean physical PCK@2 ties
+  describe_change_fraction: true # reads validation labels for a descriptive column only
+
+gate1:
+  # P7C paths of this run against the P22 Gate 1 F1 table.
+  anchor_tolerance: 0.0001
+  # Verdict thresholds: p22 gate1 raw_damage_min / headroom_min / recovery_min.

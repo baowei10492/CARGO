@@ -1,0 +1,39 @@
+# P27 development check: does untrained coarse matching on frozen DINOv3
+# tokens survive rotation? Written before running. It decides only whether
+# version 1 of the P27 localizer handles rotation; it is not evidence for any
+# claim. Validation images only, no labels (docs/P27_OWN_LOCALIZER_DESIGN.md
+# section 8, risk 1).
+status: preregistered
+purpose: p27_development_feasibility_check
+seed: 3407
+
+# Crops and translation / scale draws come from P25 (level 3 = DiffRegCD
+# Table 1); only the rotation magnitude is overridden, keeping each crop's sign.
+p25_config: configs/p25_affine_protocol.yaml
+p25_config_sha256: 561b7d292af49b263710142b1b83966425d516e2e49fcf0bfab0480eadba70ef
+crops_per_dataset: 100          # evenly spaced over the P25 600
+rotations_deg: [0, 10, 20, 30]
+
+backbone:
+  name: convnext_tiny.dinov3_lvd1689m
+  checkpoint_dir: /root/autodl-tmp/rs_cd_work/pretrained/DINOv3/convnext_tiny.dinov3_lvd1689m
+  feature_indices: [1, 2]       # strides 8 and 16
+
+fit:                            # RANSAC similarity on mutual nearest neighbours
+  reprojection_factor: 0.5      # threshold = factor x stride (4 px at stride 8, 8 px at stride 16)
+  max_iters: 2000
+  confidence: 0.999
+  refine_iters: 10
+  min_inliers: 6
+grid_points: 17
+success_px: [8, 16]             # the coarse stage only has to land inside the refinement range
+
+decision:
+  stride: 16
+  pair: real                    # T1 against perturbed T2
+  success_px: 8
+  # Mean over the three datasets. Rotation needs no special handling in
+  # version 1 if success(30 deg) >= 0.8 x success(0 deg); otherwise version 1
+  # drops rotation (translation + scale) and is evaluated on the P25
+  # perturbation with the rotation fixed at 0 (user decision 2026-09-17).
+  retention_min: 0.8

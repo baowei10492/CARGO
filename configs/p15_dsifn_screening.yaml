@@ -1,0 +1,54 @@
+status: preregistered
+dataset: DSIFN-CD
+protocol_doc: docs/P15_DSIFN_SECOND_POSITIVE_PROTOCOL.md
+
+# Gate 0 is label-free and runs entirely on frozen LEVIR checkpoints.
+# It reads no change label, trains nothing, and never touches the DSIFN
+# test split.
+geometry:
+  # DSIFN patches are 512x512, so the control run must centre-crop LEVIR
+  # to 512 and use the same tile size. Absolute dispersion is NOT
+  # comparable across geometries (main record 26: LEVIR D moves from
+  # 0.000 at 1024/512 to 7.606 at 512/256).
+  candidate_split: val
+  control_split: val
+  control_center_crop: 512
+  tile_size: 256
+  severities: [0, 1, 2, 3]
+
+gate0:
+  # Excess over the geometry-matched LEVIR control, in pixels.
+  dispersion_excess_green_max: 1.0
+  dispersion_excess_red_min: 3.0
+  # Absolute clean q trigger rate at 512 geometry. References:
+  # LEVIR@512 0.0625 (in domain), WHU@512 0.4138 (out of domain),
+  # S2Looking@1024 0.672 (true negative).
+  clean_q_green_max: 0.15
+  clean_q_red_min: 0.40
+  # Both signals must be red to stop; anything else routes to the
+  # decisive criterion (main record 71: ambiguity must not stop the
+  # chain, that rule is what saved the WHU line from a wrong stop).
+  stop_requires_both_signals_red: true
+
+gate1:
+  shift8_input_oracle_headroom_min: 0.05
+
+gate2:
+  clean_f1_drop_max: 0.001
+  shift_mean_gain_min: 0.020
+  shift8_gain_min: 0.050
+  shift8_oracle_recovery_min: 0.50
+
+gate3:
+  allowed_reruns: 0
+  reporting_only_no_selection: true
+  scenarios: [clean, shift2, shift4, shift8]
+  probability_threshold: 0.5
+  interior_border_pixels: 16
+
+reporting:
+  # DSIFN GSD is not published in the official dataset README, so every
+  # cross-dataset comparison stays in pixel units until it is confirmed
+  # (main record 71.5 forbids unit-free cross-GSD comparison).
+  gsd_meters: null
+  units: pixels

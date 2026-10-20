@@ -1,0 +1,15 @@
+seed: 3407
+split: test
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]
+primary_method: safe_veto_task
+
+# Reporting only. The structure and all decisions were frozen on validation.
+# No pass/fail gate is computed from test.
+reporting_only_no_selection: true

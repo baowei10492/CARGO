@@ -1,0 +1,18 @@
+# P32 plug-in row, BiFA: the detectors of the row (docs/P32_PLUGIN_EXTENSION.md).
+# Same shape as configs/p27_plugins/bit_f1.yaml; the P31 runner reads only the
+# 'detectors' block. Each detector is trained with the P21 recipe
+# (configs/p21/bifa_<dataset>.yaml) and scripts/run_p32.sh writes the pointer file.
+status: preregistered
+protocol_doc: docs/P32_PLUGIN_EXTENSION.md
+datasets:
+- LEVIR-CD
+- DSIFN-CD
+- WHU-CD
+detectors:
+  LEVIR-CD:
+    checkpoint_pointer: outputs/p32_detectors/bifa_levir/CHECKPOINT
+  DSIFN-CD:
+    checkpoint_pointer: outputs/p32_detectors/bifa_dsifn/CHECKPOINT
+  WHU-CD:
+    checkpoint_pointer: outputs/p32_detectors/bifa_whu/CHECKPOINT
+marker_namespace: bifa

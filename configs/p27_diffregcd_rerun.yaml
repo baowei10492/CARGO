@@ -1,0 +1,9 @@
+# DiffRegCD re-run with the wiring its change head requires (docs/P27_DIFFREGCD_RERUN.md).
+# Weights, config, split, seeds and threshold: the P27 DiffRegCD run, unchanged.
+status: preregistered
+protocol_doc: docs/P27_DIFFREGCD_RERUN.md
+diffregcd_config: configs/p27_diffregcd.yaml
+diffregcd_config_sha256: 1d398708710f6b2c6f59bffcd85cfbda2e2309683a5b711122361aac7946cf5b
+crop_margin: 64                 # border-free part: the P30 crops
+mechanism_crops: {LEVIR-CD: 600, DSIFN-CD: null, WHU-CD: 600}   # evenly spread; null = all
+parts: [mechanism, border_free, bordered]

@@ -1,0 +1,14 @@
+seed: 3407
+split: val
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+threshold: 0.5
+evaluation_border_pixels: 16
+shift_severities: [1, 2, 3]
+
+gates:
+  clean_f1_drop_max: 0.001
+  shift_mean_f1_gain_min: 0.020
+  shift8_f1_gain_min: 0.050
+  shift8_aligned_selection_rate_min: 0.50

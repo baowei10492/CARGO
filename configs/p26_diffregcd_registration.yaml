@@ -1,0 +1,49 @@
+# P26: DiffRegCD's per-dataset registration head in the P25 step 1 harness.
+# Written before any P26 run; docs/P26_DIFFREGCD_REGISTRATION_PROTOCOL.md.
+# Nothing below may be changed after a P26 result has been seen.
+status: preregistered
+protocol_doc: docs/P26_DIFFREGCD_REGISTRATION_PROTOCOL.md
+
+# Perturbation, crops, seeds, success rule and thresholds come from P25 unchanged.
+p25_config: configs/p25_affine_protocol.yaml
+p25_config_sha256: 561b7d292af49b263710142b1b83966425d516e2e49fcf0bfab0480eadba70ef
+
+# WHU-CD is excluded: our validation strip lies inside the official WHU
+# training raster that DiffRegCD's WHU head was probably trained on.
+datasets: [LEVIR-CD, DSIFN-CD]
+
+external:
+  root: /root/autodl-tmp/rs_cd_work/DiffRegCD
+  commit: 6b9acb6c4476693916b00bf4a2e2eb37a5d0ed38
+  feature_timestep: 50        # first entry of model_cd.t; checked against the author config
+  feature_level: 11           # decoder level fed to netReg in optimize_parameters()
+  backbone:
+    path: checkpoints/I200000_E3_gen.pth
+    sha256: fc4482542ddadd704e6b8f95b6d6d778eb115001f89a4e988b3202fe6248b9f7
+  registration_heads:          # Hugging Face Anita1379m/DiffRegCD, LFS digests
+    LEVIR-CD:
+      path: checkpoints/levir/best_reg_model_gen.pth
+      sha256: af9c8241e971b5c16469eb36e815b02b8ca054e8af223b3842699bdf5b3912bc
+      config_json: config/levir_test.json
+    DSIFN-CD:
+      path: checkpoints/dsifn/best_reg_model_gen.pth
+      sha256: 73813dc0831231a9b1ab21f4245e18fae7fe7faf11fdee2a52a25248227dfc49
+      config_json: config/dsifn_test.json
+
+# Similarity fit of the coarse flow field. The threshold equals the P25
+# success tolerance: the field is decoded from 8.2 px displacement classes,
+# so RoMa's 1 px threshold would discard most of it.
+fit:
+  reprojection_px: 2.0
+  max_iters: 2000
+  confidence: 0.999
+  refine_iters: 10
+  min_inliers: 8
+trigger_mean_displacement_px: 4.0
+
+# Convention calibration on self-pairs: decoding (training-loss soft-argmax
+# or forward decoding) x sign x grid; the worst self-pair error of the chosen
+# convention must be <= 2 px and <= 0.5 x that of any other sign/grid.
+selfcheck:
+  tolerance_px: 2.0
+  ambiguity_ratio: 0.5

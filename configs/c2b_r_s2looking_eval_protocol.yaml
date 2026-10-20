@@ -1,0 +1,14 @@
+# Evaluation protocol for the C2b-R radius-6 model: identical scenario
+# specification to the Stage C protocol, with maximum_offset_pixels
+# raised to the enlarged searchable domain so boundary_fraction is
+# measured against the new +-12 px limit.
+seed: 3407
+validation_split: val
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 12.0
+shift_severities: [1, 2, 3]

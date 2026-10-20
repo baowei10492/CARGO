@@ -1,0 +1,39 @@
+seed: 3407
+validation_split: val
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]
+
+# Stage C = pure transfer. Everything is frozen and LEVIR-trained except
+# the Raw/Aligned experts, which are the S2Looking P3b detector:
+#   detector (backbone.* / decoder.*): S2Looking P6 P3b best checkpoint
+#   registration stack (registration.*): LEVIR P7C checkpoint
+#   safe classifiers + probability thresholds: LEVIR P7-3 seed-3407 run
+# No component is retrained or recalibrated on S2Looking.
+
+# Label-free pre-gate, evaluated before any labeled metric is computed.
+# If it fails, the labeled evaluation is skipped entirely and the run
+# stops with status stopped_at_unlabeled_gate (dataset-specific branch).
+unlabeled_gate:
+  shift8_conditional_pck1_min: 0.50
+
+# Labeled gates are headroom-relative (S2Looking absolute headroom is
+# tiny: input-oracle Shift-8 only ~+0.033, see main record 45.2), with a
+# minimum-transferred-headroom guard so recovery ratios are meaningful.
+gates:
+  clean_f1_drop_max: 0.001
+  shift8_oracle_recovery_min: 0.50
+  shift4_oracle_recovery_min: 0.30
+  shift2_f1_gain_min: -0.001
+  shift8_oracle_gain_min: 0.005
+
+# Selected by the pre-declared Phase B rule (three-seed means decide the
+# transfer primary): safe_veto_registration beat safe_veto_task on shift
+# mean gain and Shift-8 gain in all three seeds. safe_veto_task is
+# evaluated in the same run as the preregistered ablation.
+primary_method: safe_veto_registration

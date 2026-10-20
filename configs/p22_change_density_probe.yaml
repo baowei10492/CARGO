@@ -1,0 +1,30 @@
+# P22 change-density diagnostics (A1, A2). Written before either ran:
+# docs/P22_CHANGE_DENSITY_DIAGNOSTICS.md. Nothing below may change after a
+# result has been seen.
+status: preregistered
+protocol_doc: docs/P22_CHANGE_DENSITY_DIAGNOSTICS.md
+base_config: configs/p22_whu_physical_shift.yaml   # raw root, localizer, geometry, seed
+
+# A1: train columns 0..33 and rows 0..28 of the WHU train raster only.
+train_grid: {block: 512, columns: 34, rows: 29}
+blocks_per_window: 6        # 3072 px windows, identical to P22
+mask_threshold: 127         # WHU change_label.tif is 0/255
+bins: [[0.0, 0.05], [0.05, 0.10], [0.10, 0.15], [0.15, 1.0]]
+selection:
+  per_bin: 20
+  min_spacing: 1536         # Chebyshev spacing between window origins
+a1_thresholds:
+  min_windows_per_bin: 8
+  works_pck1_min: 0.90      # physical S3 coarse PCK@1
+  works_clean_q_max: 0.10
+  fails_pck1_max: 0.50
+  fails_clean_q_min: 0.50
+
+# A2: existing P21 per-sample decisions; LEVIR-CD is the reference only.
+a2_detector: BIT
+a2_datasets: [LEVIR-CD, DSIFN-CD, GZ-CD]
+a2_thresholds:
+  rho_min: 0.30
+  rho_null_max: 0.10
+  min_samples_per_bin: 10
+  high_over_low_min: 2.0

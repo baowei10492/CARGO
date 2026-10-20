@@ -1,0 +1,23 @@
+# P21 amendment D (docs/P21_DETECTOR_AGNOSTIC_PROTOCOL.md section 12): the
+# one-shot LEVIR-CD test of the three published detectors. Every evaluation
+# setting equals the validation protocol the cells were judged with
+# (configs/p7_safe_alignment_classifier.yaml); tests/test_p21_final_test.py
+# compares them key by key.
+seed: 3407
+split: test
+dataset: LEVIR-CD
+detectors: [BIT, CD-Lamba, CDxLSTM]
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]
+primary_method: safe_veto_task
+reported_methods: [raw, always_aligned, safe_veto_task]
+
+# Reporting only. Verdicts stay with the validation cells; nothing computed
+# here selects a model, a router, a threshold or a column.
+reporting_only_no_selection: true

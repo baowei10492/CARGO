@@ -1,0 +1,13 @@
+name: p7_feature_oracle_t2_v1
+seed: 3407
+split: val
+batch_size: 4
+num_workers: 8
+prefetch_factor: 2
+threshold: 0.5
+evaluation_border_pixels: 16
+shift_severities: [1, 2, 3]
+feature_oracle_recovery_min:
+  shift_4px: 0.80
+  shift_8px: 0.80
+clean_f1_drop_max: 0.001

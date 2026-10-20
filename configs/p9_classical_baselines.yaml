@@ -1,0 +1,44 @@
+# P9-A: classical registration baselines under one frozen detector.
+# Scenario specification is identical to the P7-3 protocol so the F1
+# numbers land on the same operating points and are directly comparable.
+seed: 3407
+validation_split: val
+batch_size: 4
+num_workers: 4
+prefetch_factor: 2
+amp: true
+threshold: 0.5
+evaluation_border_pixels: 16
+maximum_offset_pixels: 8.0
+shift_severities: [1, 2, 3]
+
+methods: [phase, ecc, sift]
+ecc_fallback_to_phase: true
+
+# The classical analogue of the learned q gate: align only when the
+# estimated displacement is at least this large. 1.0 px is the smallest
+# threshold that still lets a method decline to touch a clean pair.
+gate_pixels: 1.0
+
+# P7-3 seed-3407 recorded operating point (main record 82.1 baseline
+# column). A classical variant "matches" when it reaches the shift-mean
+# gain within `margin` AND keeps the clean drop within `clean_drop_max`.
+# Both conditions are required: recovering shift performance by damaging
+# clean pairs is precisely what the router exists to prevent.
+reference_operating_point:
+  shift_mean_gain: 0.0821040740827695
+  clean_drop: 0.0
+  margin: 0.005
+  clean_drop_max: 0.001
+
+# Reproduce-a-known-number guard (main record 85.4). These are the P7-3
+# seed-3407 recorded raw F1 values on LEVIR val. If this tool cannot
+# reproduce them, it is measuring the wrong thing and must refuse to
+# report -- the first version of it silently measured the q-gated path
+# as "raw" and produced a favourable verdict.
+expected_raw_f1:
+  clean:s0:common: 0.903212
+  shift:s1:t2: 0.867229
+  shift:s2:t2: 0.805300
+  shift:s3:t2: 0.679282
+expected_raw_f1_tolerance: 0.0001

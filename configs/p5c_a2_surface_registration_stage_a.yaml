@@ -1,0 +1,73 @@
+experiment:
+  name: p5c_a2_surface_registration_stage_a
+  seed: 3407
+  output_root: outputs
+
+data:
+  dataset_root: data/raw/LEVIR-CD
+  manifest: manifests/datasets/levir_cd.csv
+  train_split: train
+  val_split: val
+  test_split: test
+  train_crop_size: 256
+  eval_crop_size: null
+  num_workers: 8
+  prefetch_factor: 4
+  cache_mode: ram
+  normalization: imagenet
+  mask_threshold: 127
+  train_flip: true
+  train_rotate90: true
+  positive_crop_probability: 0.7
+  positive_crop_min_pixels: 64
+  positive_crop_trials: 8
+  misregistration_probability: 0.75
+  misregistration_pixels: [2, 4, 8]
+  misregistration_target: t2
+
+model:
+  name: dinov3_global_registration_cd
+  backbone_name: convnext_tiny.dinov3_lvd1689m
+  pretrained: true
+  checkpoint_path: /root/autodl-tmp/rs_cd_work/pretrained/DINOv3/convnext_tiny.dinov3_lvd1689m
+  freeze_backbone: true
+  trainable_stages: 0
+  decoder_channels: 128
+  search_radius: 3
+  initial_logit_scale: 2.0
+  surface_decoder_channels: 16
+  normalize_score_surface: true
+  registration_only: true
+  freeze_registration: false
+  use_confidence_gate: false
+  target_distribution_sigma: 0.5
+  offset_distribution_weight: 1.0
+  offset_regression_weight: 1.0
+  fusion_regularization_weight: 0.0
+  in_channels: 3
+
+loss:
+  bce_weight: 1.0
+  dice_weight: 1.0
+  pos_weight: 2.0
+
+training:
+  epochs: 15
+  samples_per_epoch: 8192
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  amp: true
+  allow_tf32: true
+  deterministic: false
+  grad_clip_norm: 5.0
+  checkpoint_interval: 1
+  log_interval: 10
+  initial_checkpoint: null
+  initial_checkpoint_strict: false
+
+evaluation:
+  batch_size: 4
+  threshold: 0.5
+  validation_interval: 3
+  save_predictions: false

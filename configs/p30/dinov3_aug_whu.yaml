@@ -1,0 +1,76 @@
+# P30 augmentation baseline (docs/P30_BORDER_FREE_PROTOCOL.md): configs/p29/dinov3_aug_whu.yaml
+# with border-free perturbed crops; only experiment.name and affine_context_margin differ.
+# P29: the DINOv3 detector of the P27 WHU row (configs/p8_whu_dinov3_partial_ft.yaml) retrained from the
+# same initialization with the same recipe, plus test-matched misalignment augmentation.
+# Only experiment.name, the augmentation keys differ.
+experiment:
+  name: p30_dinov3_aug_whu
+  seed: 3407
+  output_root: outputs
+
+# P3b recipe held fixed from LEVIR/S2Looking except where the 512 px tile
+# size forces a change. Deviations are listed in
+# docs/P8_WHU_INDOMAIN_REPLICATION.md section 6 and are the only ones.
+data:
+  dataset_root: /root/autodl-tmp/rs_cd_work/data/WHU-CD
+  manifest: manifests/datasets/whu_cd.csv
+  train_split: train
+  val_split: val
+  test_split: test
+  train_crop_size: 256
+  eval_crop_size: null
+  num_workers: 8
+  prefetch_factor: 4
+  cache_mode: ram
+  normalization: imagenet
+  mask_threshold: 127
+  train_flip: true
+  train_rotate90: true
+  positive_crop_probability: 0.7
+  positive_crop_min_pixels: 64
+  positive_crop_trials: 8
+  # P29 augmentation baseline (docs/P29_AUGMENTATION_BASELINE.md): T2 perturbed like
+  # the P27 test levels (configs/p27_eval_perturbation.yaml, no rotation) in 75% of the
+  # training crops, level 1-3 uniformly; pixels without T2 content are left out of the loss.
+  affine_misregistration_probability: 0.75
+  affine_max_translation_px: 25.0
+  affine_scale_range: [0.80, 1.25]
+  affine_levels: 3
+  # P30: perturbed crops are cut from the warped crop plus 64 px of real context (no zero border)
+  affine_context_margin: 64
+
+model:
+  name: dinov3_convnext_cd
+  backbone_name: convnext_tiny.dinov3_lvd1689m
+  pretrained: true
+  checkpoint_path: /root/autodl-tmp/rs_cd_work/pretrained/DINOv3/convnext_tiny.dinov3_lvd1689m
+  freeze_backbone: false
+  trainable_stages: 2
+  decoder_channels: 128
+  in_channels: 3
+
+loss:
+  bce_weight: 1.0
+  dice_weight: 1.0
+  pos_weight: 2.0
+
+training:
+  epochs: 40
+  samples_per_epoch: 8192
+  batch_size: 32
+  learning_rate: 0.0003
+  backbone_learning_rate: 0.00002
+  weight_decay: 0.0001
+  amp: true
+  allow_tf32: true
+  deterministic: false
+  grad_clip_norm: 1.0
+  checkpoint_interval: 5
+  log_interval: 20
+  initial_checkpoint: null
+
+evaluation:
+  batch_size: 8
+  threshold: 0.5
+  validation_interval: 5
+  save_predictions: false

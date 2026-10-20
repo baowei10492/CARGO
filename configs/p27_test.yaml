@@ -1,0 +1,10 @@
+# P27 final test: the frozen P27 localizer (version 1, best.pth), the frozen
+# DINOv3 detectors of the F1 step and the selectors that went through the
+# validation run (main record 192.9), on every 256 px test crop of LEVIR-CD,
+# DSIFN-CD and WHU-CD. Run once; reporting only. Crops, perturbations,
+# scoring pixels and paths are those of the validation run.
+status: preregistered
+selector_config: configs/p27_selector.yaml
+selector_config_sha256: cd37272732448ebe88d42b6feb3d28b7e45f0f19db72dd28763e0d3d80dab509
+split: test
+max_test_runs: 1

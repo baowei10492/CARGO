@@ -1,0 +1,23 @@
+# P27 plug-in row, CD-Lamba on WHU-CD: F1 step (docs/P27_EXPERIMENTS_AMENDMENT.md).
+# The detector is trained with the P21 recipe (configs/p21/cdlamba_whu.yaml); the training
+# script writes the pointer file. Rules as configs/p27_f1_gate.yaml.
+status: preregistered
+protocol_doc: docs/P27_EXPERIMENTS_AMENDMENT.md
+evaluation_config: configs/p27_eval_perturbation.yaml
+evaluation_config_sha256: 64fd0aed61580f1dd0b35d3f491a0db19335c98cf94735347c8e9a42cf7e99fa
+crops: all
+datasets:
+- WHU-CD
+detectors:
+  WHU-CD:
+    checkpoint_pointer: outputs/p27_whu_detectors/cdlamba/CHECKPOINT
+marker_namespace: cdlamba_whu
+decision:
+  primary_path: estimated_gated
+  binding_levels:
+  - 2
+  - 3
+  min_gain: 0.0
+  max_clean_drop: 0.005
+instrument:
+  min_clean_raw_f1: 0.5

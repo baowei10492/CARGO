@@ -1,0 +1,65 @@
+# P22: WHU-CD second positive under physically matched displacements.
+# Written before any P22 run; docs/P22_WHU_PHYSICAL_SHIFT_PROTOCOL.md.
+# Nothing below may be changed after a P22 result has been seen.
+status: preregistered
+protocol_doc: docs/P22_WHU_PHYSICAL_SHIFT_PROTOCOL.md
+raw_root: /root/autodl-tmp/rs_cd_work/data/_raw_whu/Building change detection dataset_add
+seed: 3407
+amp: true
+
+geometry:
+  gsd_m: 0.075
+  tile_size: 512
+  window_size: 3072          # 230.4 m coverage, the main record 77 probe point
+  downsample_factor: 6       # 0.45 m working GSD for the localizer
+  # Physical family = (2, 4, 8) x factor = 12 / 24 / 48 native px
+  #                 = 0.9 / 1.8 / 3.6 m (LEVIR 2/4/8 px are 1 / 2 / 4 m).
+  train_region: {x_max: 17408, y_max: 14848}   # train columns 0..33 only
+  val_columns: [35, 36, 37, 38, 39, 40]
+  val_rows: 29
+
+checkpoints:
+  localizer: outputs/p7c_fullres_shift_calibration/20260726T061340Z_seed3407/checkpoints/last.pth
+  localizer_sha256: 389c65e1f888455b12385b6241e16ef942a3c357b4ec96b198732d93747325b2
+  detector: outputs/p8_whu_dinov3_partial_ft/20260726T145452Z_seed3407/checkpoints/best.pth
+  p8_oracle_protocol: configs/p8_whu_oracle_t2_shift.yaml
+
+gate0:
+  blocks: 60
+  conditional_pck1_min: 0.70        # coarse px, physical severities 2 and 3
+  conditional_pck2_min: 0.85
+  clean_gated_within_1px_min: 0.90  # reported; a clean failure does not stop
+
+gate1:
+  # Common interior support for every scenario and path of the main
+  # measurement (P12 rule: same valid pixels per scenario). Must be >= the
+  # largest injected shift (48 px); the tool refuses otherwise.
+  # 416 x 416 = 173,056 px per tile, 30,111,744 px over 174 tiles.
+  evaluation_border_pixels: 48
+  # Anchor batch size is read from the P8 protocol, as evaluate_robustness
+  # resolved it, so cuDNN algorithm selection matches the P8 run.
+  anchor_tolerance: 0.0001
+  # Authoritative source: reports/p8_whu_p3b/20260726T145440Z/{raw_val,oracle_val}/results.csv.
+  # Corrected 2026-09-14 before the main measurement ran: the first values were
+  # transcribed from the main record 71.1 table, whose raw and oracle rows carry
+  # typing errors (its headroom row is correct). See main record 155.
+  # P8 supports verified from results.csv valid_pixels: raw one-sided, oracle paired.
+  anchor_reference:
+    clean: 0.93445407
+    raw:                            # one-sided support, as P8 evaluated raw
+      "shift:s1:t2": 0.91631449
+      "shift:s2:t2": 0.88565873
+      "shift:s3:t2": 0.82526188
+    oracle:                         # paired support
+      "shift:s1:t2": 0.93450297
+      "shift:s2:t2": 0.93456561
+      "shift:s3:t2": 0.93405923
+  raw_damage_min: 0.05              # physical s3: raw clean - raw shifted
+  headroom_min: 0.05                # physical s3: oracle - raw
+  recovery_min: 0.50                # physical s2 and s3: estimated recovery of headroom
+
+gate2:                              # values fixed now; implementation note written before running
+  clean_f1_drop_max: 0.001
+  shift_mean_f1_gain_min: 0.020
+  shift8_f1_gain_min: 0.050         # applies to physical s3 (48 px)
+  shift8_oracle_recovery_min: 0.50

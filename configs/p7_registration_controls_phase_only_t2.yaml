@@ -1,0 +1,11 @@
+name: p7_registration_controls_phase_only_t2_v1
+seed: 3407
+split: val
+batch_size: 4
+num_workers: 8
+prefetch_factor: 2
+threshold: 0.5
+evaluation_border_pixels: 16
+shift_severities: [1, 2, 3]
+max_abs_shift: 12
+methods: [raw, phase, oracle]

@@ -1,0 +1,6 @@
+# P27 plug-in row, BIT on WHU-CD: final test, once. Reporting only.
+status: preregistered
+selector_config: configs/p27_plugins/bit_whu_selector.yaml
+selector_config_sha256: f58d596119927d1ab53b2b87ab0ade1149dd98366f406e0daaea0cb3e51efca0
+split: test
+max_test_runs: 1

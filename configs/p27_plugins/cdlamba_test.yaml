@@ -1,0 +1,7 @@
+# P27 plug-in row, CD-Lamba: final test, once, with the selectors of this row
+# that went through the validation run. Reporting only.
+status: preregistered
+selector_config: configs/p27_plugins/cdlamba_selector.yaml
+selector_config_sha256: bd397be6d7cac4e0fa734c84492d149b4c9c7ec3e8f60bb1fff48cc15dca8ba4
+split: test
+max_test_runs: 1

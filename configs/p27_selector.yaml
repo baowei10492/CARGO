@@ -1,0 +1,56 @@
+# P27 selector step (docs/P27_SELECTOR_AMENDMENT.md). Written after the P27
+# F1 result (main record 192.7) and before any selector was trained or
+# evaluated. Nothing below may be changed once a selector result exists.
+status: preregistered
+protocol_doc: docs/P27_SELECTOR_AMENDMENT.md
+seed: 3407
+
+# Detectors, perturbations, crops, scoring pixels and the verdict rule come
+# from the F1 step (and, through it, the P27 evaluation config).
+f1_config: configs/p27_f1_gate.yaml
+f1_config_sha256: c15fc4c4e45c6fb87d66000fa5406071c4947a652051937db3785aec8c0702d2
+# The F1 run whose raw / oracle / estimated / gated table the evaluation must reproduce.
+f1_reference_decision: reports/p27_localizer/f1/20260917T031325Z/run/f1_decision.json
+anchor_tolerance: 0.001
+
+# The frozen localizer that ran the F1 step, and its training run (hold-out split).
+localizer_run: outputs/p27_localizer/20260916T164212Z
+localizer_checkpoint: best.pth
+
+training_crops:
+  split: train
+  max_fit_crops_per_dataset: 3000   # evenly spaced over the non-hold-out training crops
+  early_stop_fraction: 0.15         # of the non-hold-out tiles, by tile hash
+  # risk calibration = every crop of the localizer's hold-out tiles
+
+# P7-3 recipe (configs/p7_safe_alignment_classifier.yaml), unchanged.
+label:
+  benefit_margin: 0.0
+weights:
+  magnitude_scale: 0.05
+  magnitude_floor: 0.05
+  magnitude_cap: 4.0
+  unsafe_weight: 3.0
+  clean_unsafe_extra_weight: 2.0
+classifier:
+  hidden_dims: [32, 16]
+  dropout: 0.10
+  max_epochs: 300
+  early_stop_patience: 60
+  batch_size: 128
+  learning_rate: 0.001
+  weight_decay: 0.001
+risk:                                # used only by the reused P7-3 trainer for its own audit
+  probability_floor: 0.5
+  threshold_epsilon: 0.000001
+  coverage_grid_points: 101
+
+calibration:
+  clean_drop_target: 0.0025          # half of the 0.005 allowed on validation
+  tau_grid_start: 0.50
+  tau_grid_stop: 1.00
+  tau_grid_step: 0.01                # no tau passes -> never correct
+
+evaluation:
+  primary_path: selector             # correct when P(safe) >= tau, on every crop
+  max_selector_versions: 1

@@ -1,0 +1,69 @@
+# External baseline engineering validation only. This protocol was written
+# before any DiffRegCD LEVIR validation or test result was observed.
+status: preregistered
+external_method: DiffRegCD
+external_commit: 6b9acb6c4476693916b00bf4a2e2eb37a5d0ed38
+split: val
+seed: 3407
+scenarios:
+  - {name: clean, severity: 0, mode: common}
+  - {name: shift, severity: 1, mode: t2, pixels: 2}
+  - {name: shift, severity: 2, mode: t2, pixels: 4}
+  - {name: shift, severity: 3, mode: t2, pixels: 8}
+input:
+  original_image_size: 1024
+  external_model_size: 256
+  tile_size: 256
+  tile_overlap: 0
+  tile_batch_size: 2
+  shift_before_tiling: true
+  normalization: minus_one_to_one
+  common_random_numbers_across_scenarios: true
+  temporal_mapping:
+    external_A_t1: project_image_t1
+    external_B_t0: project_image_t2
+weights:
+  backbone:
+    relative_path: checkpoints/I200000_E3_gen.pth
+    sha256: fc4482542ddadd704e6b8f95b6d6d778eb115001f89a4e988b3202fe6248b9f7
+  registration:
+    relative_path: checkpoints/levir/best_reg_model_gen.pth
+    sha256: af9c8241e971b5c16469eb36e815b02b8ca054e8af223b3842699bdf5b3912bc
+  change_detection:
+    relative_path: checkpoints/levir/best_cd_model_gen.pth
+    sha256: 842b3a83a764c26982fb93993ca30dce6e467fab3ccce247ebf7a3200cb38c02
+evaluation:
+  probability_threshold: 0.5
+  interior_border_pixels: 16
+  use_corruption_valid_mask: true
+  metrics:
+    - change_precision
+    - change_recall
+    - change_f1
+    - change_iou
+    - overall_accuracy
+    - mean_f1_author_compatibility
+  inference_paths:
+    - official_unmodified
+    - intended_warped
+author_reference:
+  source: WACV_2026_Table_2
+  evaluation_distribution_note: >-
+    The paper evaluates the author's synthetic affine protocol, whereas this
+    adapter first audits clean official LEVIR pairs and controlled 2/4/8-pixel
+    translations. Deltas are therefore reported but require manual
+    interpretation rather than acting as an automatic model-selection gate.
+  mean_f1: 0.929
+  mean_iou: 0.881
+  overall_accuracy: 0.987
+  change_f1: 0.872
+gates:
+  require_weight_sha256: true
+  require_same_valid_pixel_support: true
+  require_direction_unit_test: true
+  require_clean_reproduction_audit: true
+test_policy:
+  run_test: false
+  reason: >-
+    Freeze the external adapter on validation before registering any
+    reporting-only external baseline test.

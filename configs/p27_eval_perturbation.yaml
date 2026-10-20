@@ -1,0 +1,63 @@
+# P27 evaluation: the P25 step 1 harness with the rotation fixed at 0
+# (main record 192.2). Every other setting is P25's, so crops, per-crop
+# scale / translation draws, success rule and thresholds are identical.
+# Written before any P27 localizer was trained or evaluated;
+# docs/P27_LOCALIZER_EVALUATION_PROTOCOL.md. Nothing below may be changed
+# after a P27 evaluation result has been seen.
+status: preregistered
+protocol_doc: docs/P27_LOCALIZER_EVALUATION_PROTOCOL.md
+seed: 3407
+
+perturbation:
+  # DiffRegCD (WACV 2026) Table 1, default level: translation U[-25, 25] px,
+  # rotation U[-30, 30] deg, scale U[0.80, 1.25], 256 px crops, built with
+  # cv2.getRotationMatrix2D about the crop centre. (Their released script
+  # defaults, +-16 px / +-20 deg / 0.90-1.15, are not used.)
+  # P27 keeps the translation and scale ranges and disables the rotation.
+  crop_size: 256
+  max_rotation_deg: 0.0          # P27 version 1: no rotation
+  scale_range: [0.80, 1.25]
+  max_translation_px: 25.0
+  # Level k uses k/3 of every range around the identity, with the same uniform
+  # draws per crop; level 3 is the published default. Applied to T2 only,
+  # bilinear, zero outside the image.
+  levels: [1, 2, 3]
+
+datasets:
+  - {name: LEVIR-CD, dataset_root: /root/autodl-tmp/rs_cd_work/data/LEVIR-CD,
+     manifest: manifests/datasets/levir_cd.csv, split: val, tile_size: 1024, mask_threshold: 127}
+  - {name: DSIFN-CD, dataset_root: /root/autodl-tmp/rs_cd_work/data/DSIFN-CD/DSIFN,
+     manifest: manifests/datasets/dsifn_cd_source_split.csv, split: val, tile_size: 512, mask_threshold: 0}
+  - {name: WHU-CD, dataset_root: /root/autodl-tmp/rs_cd_work/data/WHU-CD,
+     manifest: manifests/datasets/whu_cd.csv, split: val, tile_size: 512, mask_threshold: 127}
+
+localizer:
+  kind: roma_outdoor_similarity
+  num_matches: 5000
+  use_custom_corr: true
+  fused_local_corr_version: "0.1.1"
+  # OpenCV estimateAffinePartial2D: rotation + uniform scale + translation.
+  ransac_reprojection_px: 1.0
+  ransac_max_iters: 2000
+  ransac_confidence: 0.999
+  refine_iters: 10
+  min_inliers: 8
+  # Zero-perturbation decision: mean grid displacement of the estimate above
+  # 4 px (twice the ~2 px residual WHU offset of main record 188.2).
+  trigger_mean_displacement_px: 4.0
+
+step1:
+  max_crops_per_dataset: 600      # evenly spaced over the validation crops
+  grid_points: 17                 # 17 x 17 grid for transfer errors
+  success_ate_px: 2.0             # mean transfer error, raw or relative to the clean estimate
+  tracking_rate_min: 0.80
+  binding_levels: [2, 3]
+  clean_trigger_max: 0.10         # reported; never stops
+  selfcheck_pool: 20              # most textured 3 of the first 20 crops
+  selfcheck_crops: 3
+  selfcheck_tolerance_px: 1.0     # T1 against its own level-3 perturbation
+
+# P27 localizer (the RoMa row above is the baseline run through the P25 tool).
+p27:
+  trigger_probability: 0.5        # clean / misaligned decision: sigmoid(misaligned_logit) > 0.5
+  max_frozen_versions: 2          # at most two frozen localizer versions ever meet these crops

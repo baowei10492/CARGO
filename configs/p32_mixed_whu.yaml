@@ -1,0 +1,18 @@
+# P32 mixed-distribution evaluation (docs/P32_PLUGIN_EXTENSION.md, section 3).
+#
+# One test set in which a pair may be aligned or misaligned and no method is told which.
+# The state of a crop is fixed by a deterministic hash of its identifier: written down
+# once, never re-drawn, and the same before and after the two added detectors arrive.
+status: preregistered
+protocol_doc: docs/P32_PLUGIN_EXTENSION.md
+dataset: WHU-CD                 # 2552 border-free test crops, the largest of the three
+seed: 3407
+states:                         # equal thirds, in this order
+- {name: aligned, level: 0}
+- {name: small, level: 1}
+- {name: large, level: 3}
+# SNUNet and BiFA joined on 2026-09-22, when their test records existed; the
+# assignment above (dataset, seed, states) is untouched, so the earlier rows
+# see exactly the same mixed set as before.
+rows: [dinov3, bit, cdlamba, cdxlstm, snunet, bifa]
+augmentation_row: dinov3        # the misalignment-augmentation baseline exists for this row only
