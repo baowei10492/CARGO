@@ -55,3 +55,7 @@ done
 ```
 
 复合与纯扰动的裁块集合和计分掩膜不同，各自使用同一张表内的基线。选择器损失曲线可用 `plot_selector_original_log.py --log ... --summary ... --output ...` 重绘；S1 已保存曲线上实际记录的数值。交付中的运行示例只启动评估或训练，机器电源由使用者管理。
+
+### 原生 S2Looking 历史记录版本
+
+同名的 S2Looking 预测在不同时期的工程快照中存在不同版本。录用稿使用的 `records_S2Looking.csv` 的 SHA-256 是 `b2b4c4f51ac81109b108de7d3a4cb65c4d33efc1a81a4e01d4b64b53bc9955c1`；配套 `test_S2Looking.json` 是 `1762ea51de8bfae7c86b4157e8afc564b3387110d81be47aa822caf2dd8ea3bb`。在这份记录上运行本包的原生审计程序，16,000 个裁块中有 751 个采用配准，Raw、Always、CARGO 的 F1 分别为 63.51503%、62.36179%、63.98574%。用原始记录进行复算时，可用这组指纹确定版本。
