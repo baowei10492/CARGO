@@ -1,0 +1,25 @@
+{
+  "method": "DiffRegCD released test path (diffusion features + change head; flow head excluded)",
+  "dataset_weights": "LEVIR-CD",
+  "external_commit": "6b9acb6c4476693916b00bf4a2e2eb37a5d0ed38",
+  "device": "NVIDIA GeForce RTX 4090",
+  "batch": 1,
+  "crop_size": 256,
+  "timesteps": [
+    50,
+    100,
+    400
+  ],
+  "parameters": {
+    "diffusion_backbone": 391048067,
+    "change_head": 46405126,
+    "registration_head": 143211522
+  },
+  "timing": {
+    "median_ms": 210.99414280615747,
+    "mean_ms": 211.02317480370402,
+    "p10_ms": 210.79773362725973,
+    "p90_ms": 211.26553090289235,
+    "repeats": 200
+  }
+}

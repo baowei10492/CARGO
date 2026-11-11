@@ -1,0 +1,64 @@
+{
+  "protocol": "CARGO_round1_pure_conditions_20261105",
+  "seed": 3407,
+  "crop_size": 256,
+  "crop_margin": 64,
+  "bootstrap_repetitions": 2000,
+  "evaluation_config": "configs/p27_eval_perturbation.yaml",
+  "localizer": {
+    "checkpoint": "outputs/p30_localizer/20260918T070115Z/checkpoints/best.pth",
+    "sha256": "329e7956570e3fb4950940195ba9d9700309f5cb994cdd36acb40cd598018289"
+  },
+  "datasets": {
+    "WHU-CD": {
+      "dataset_root": "/root/autodl-tmp/rs_cd_work/data/WHU-CD",
+      "manifest": "manifests/datasets/whu_cd.csv",
+      "tile_size": 512,
+      "mask_threshold": 127,
+      "expected_test_crops": 2552,
+      "detector": "outputs/p8_whu_dinov3_partial_ft/20260726T145452Z_seed3407/checkpoints/best.pth",
+      "detector_sha256": "3805359459ade6665ba7488b1096556c09e82925ec1c40d398fdb79f61786da3",
+      "selector": "reports/p30/selector/20260918T104133Z/bundles/selector_WHU-CD.pth",
+      "selector_sha256": "eabeccad392072e728866e2ae23be2bd12fc9a1021d17dee017c9fcea7ac44dc",
+      "tau": 0.62
+    }
+  },
+  "E2": {
+    "dataset": "WHU-CD",
+    "conditions": [
+      {
+        "name": "native"
+      },
+      {
+        "name": "scale_only",
+        "scale_only": true
+      },
+      {
+        "name": "rotation10",
+        "rotation_limit_deg": 10
+      },
+      {
+        "name": "rotation30",
+        "rotation_limit_deg": 30
+      },
+      {
+        "name": "local6",
+        "backward_field_rms_px": 6
+      }
+    ],
+    "paths": [
+      "raw",
+      "estimated",
+      "cargo"
+    ],
+    "field_grid": 9,
+    "scoring": "Intersection of the original main-protocol L1-L3 mask and true in-crop support of all five isolated conditions, shared by all paths and rows.",
+    "coverage_policy": "Before checkpoint loading or inference, retain only crops whose entire perturbed raw input samples real pixels within its source tile in every condition and has nonempty common scoring support; record all exclusions.",
+    "interpretation": "Isolated added synthetic distortions on the native supplied pairs; no additional translation; rotations at unit scale; scale-only at zero rotation; local field at identity global transform; frozen checkpoints and original tau."
+  },
+  "base_runner_sha256": "050f85fc5c62a8218d1f6b04941e59a2682ec8128cb224f7e41d953427f05339",
+  "pinned_helpers": {
+    "round1_formal.py": "050f85fc5c62a8218d1f6b04941e59a2682ec8128cb224f7e41d953427f05339",
+    "round1_stress.py": "550eb05fdfebb7abad314c6667572853aa4d17ff1bc8d4e65fb3dc1fb09943a9"
+  }
+}

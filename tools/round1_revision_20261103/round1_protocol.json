@@ -1,0 +1,74 @@
+{
+  "protocol": "CARGO_round1_20261103_v1",
+  "seed": 3407,
+  "crop_size": 256,
+  "crop_margin": 64,
+  "bootstrap_repetitions": 2000,
+  "evaluation_config": "configs/p27_eval_perturbation.yaml",
+  "localizer": {
+    "checkpoint": "outputs/p30_localizer/20260918T070115Z/checkpoints/best.pth",
+    "sha256": "329e7956570e3fb4950940195ba9d9700309f5cb994cdd36acb40cd598018289"
+  },
+  "datasets": {
+    "LEVIR-CD": {
+      "dataset_root": "/root/autodl-tmp/rs_cd_work/data/LEVIR-CD",
+      "manifest": "manifests/datasets/levir_cd.csv",
+      "tile_size": 1024,
+      "mask_threshold": 127,
+      "expected_test_crops": 2048,
+      "detector": "outputs/p3b_dinov3_convnext_tiny_partial_ft/20260724T151633Z_seed3407/checkpoints/best.pth",
+      "detector_sha256": "3c8aaf7174ab43618e38bf51aaf0e889253a3905b0be0e1994a30fcbfbc82102",
+      "selector": "reports/p30/selector/20260918T104133Z/bundles/selector_LEVIR-CD.pth",
+      "selector_sha256": "f61890f3cdd0f32427d2bfc0606853ac1b26836ec0303d54bcbc4b2bf169d7d9",
+      "tau": 0.5
+    },
+    "WHU-CD": {
+      "dataset_root": "/root/autodl-tmp/rs_cd_work/data/WHU-CD",
+      "manifest": "manifests/datasets/whu_cd.csv",
+      "tile_size": 512,
+      "mask_threshold": 127,
+      "expected_test_crops": 2552,
+      "detector": "outputs/p8_whu_dinov3_partial_ft/20260726T145452Z_seed3407/checkpoints/best.pth",
+      "detector_sha256": "3805359459ade6665ba7488b1096556c09e82925ec1c40d398fdb79f61786da3",
+      "selector": "reports/p30/selector/20260918T104133Z/bundles/selector_WHU-CD.pth",
+      "selector_sha256": "eabeccad392072e728866e2ae23be2bd12fc9a1021d17dee017c9fcea7ac44dc",
+      "tau": 0.62
+    },
+    "S2Looking": {
+      "dataset_root": "/root/autodl-tmp/rs_cd_work/data/S2Looking",
+      "manifest": "manifests/datasets/s2looking.csv",
+      "tile_size": 1024,
+      "mask_threshold": 127,
+      "expected_test_crops": 16000,
+      "detector": "outputs/p33_dinov3_s2looking/20261008T174451Z_seed3407/checkpoints/best.pth",
+      "detector_sha256": "a71ff6cd390888d1881435402387eb0e2ab1eefaefec720692568863b60635bc",
+      "selector": "reports/p33/selector/v2/dinov3_s2looking/selector_S2Looking.pth",
+      "selector_sha256": "380b2d759d07b21f29d55c2cbc882f0b88481d7d755bda9e8d9c466ad656bcb1",
+      "tau": 0.5
+    }
+  },
+  "E3": {
+    "dataset": "LEVIR-CD",
+    "levels": [0, 3],
+    "paths": ["raw", "output_remap", "oracle_input", "estimated", "cargo"],
+    "output_remap": "bilinear sampling of raw probability at M(p), then threshold; diagnostic, not an additive causal decomposition",
+    "scoring": "original per-crop intersection for levels 1, 2, 3; identical for every path and both evaluated levels"
+  },
+  "E2": {
+    "dataset": "WHU-CD",
+    "conditions": [
+      {"name": "native", "base_level": 0, "rotation_limit_deg": 0, "backward_field_rms_px": 0},
+      {"name": "ts_level1", "base_level": 1, "rotation_limit_deg": 0, "backward_field_rms_px": 0},
+      {"name": "ts_level1_rot1", "base_level": 1, "rotation_limit_deg": 1, "backward_field_rms_px": 0},
+      {"name": "ts_level1_rot3", "base_level": 1, "rotation_limit_deg": 3, "backward_field_rms_px": 0},
+      {"name": "ts_level1_local1", "base_level": 1, "rotation_limit_deg": 0, "backward_field_rms_px": 1},
+      {"name": "ts_level1_local3", "base_level": 1, "rotation_limit_deg": 0, "backward_field_rms_px": 3}
+    ],
+    "field_grid": 9,
+    "field_definition": "one zero-mean bicubic 9x9 random vector field per crop on the 512px tile; normalized to unit vector RMS over the tile, shared between strengths; q samples original tile at inverse(M)(q+d(q)); record achieved source displacement RMS and maximum",
+    "scoring": "intersection of original L1-L3 masks and true forward in-crop support for all six conditions, common to all conditions and paths; source pixels of all raw crops must be valid",
+    "paths": ["raw", "estimated", "cargo"]
+  },
+  "E1": {"dataset": "S2Looking", "native_pairs": 30, "tiepoint_rows_per_pair": 10, "selection": "SHA256 ranking of test tile identifiers; one hashed crop per tile, fixed before inference; no synthetic perturbation; independent tiepoints remain to be manually annotated"},
+  "E7": {"dataset": "WHU-CD", "tiles": 12, "levels": [0, 3], "selection": "same deterministic tile/crop hashing, fixed before inference"}
+}

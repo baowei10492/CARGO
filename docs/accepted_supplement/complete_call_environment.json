@@ -1,0 +1,25 @@
+{
+  "precision": "float32; TF32 disabled for all methods",
+  "device": "NVIDIA vGPU-32GB",
+  "gpu_properties": {
+    "total_memory_MiB": 32228.8125
+  },
+  "torch_version": "2.5.1+cu124",
+  "opencv_threads": 4,
+  "host_threads": 4,
+  "input_size": 256,
+  "timer": "synchronized wall-clock; complete per-pair call, no sum of component medians",
+  "input_loading": "tile content resident in host memory; file I/O and checkpoint loading excluded",
+  "estimator_cache": "disabled; every repeat runs both registration directions",
+  "sampling": "4 evenly spaced existing test crop indices per dataset; same inputs for all methods",
+  "synthetic_perturbation_generation_timed": false,
+  "repeats": 5,
+  "warmup": 5,
+  "instance_configuration_confirmation": {
+    "gpu_instance_configuration": "NVIDIA GeForce RTX 4080 SUPER vGPU",
+    "allocated_device_memory_GB": 32,
+    "evidence": "Instance designation confirmed retrospectively by the authors from a matching cloned configuration; the device, memory and software fields above are from the historical timing record.",
+    "fractional_compute_share_quota": "not recorded",
+    "physical_device_mapping": "not retained"
+  }
+}

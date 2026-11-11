@@ -1,0 +1,44 @@
+experiment:
+  name: p2_fc_siam_diff_pilot_bs32
+  seed: 3407
+  output_root: outputs
+
+data:
+  dataset_root: data/raw/LEVIR-CD
+  manifest: manifests/datasets/levir_cd.csv
+  train_split: train
+  val_split: val
+  test_split: test
+  train_crop_size: 256
+  eval_crop_size: null
+  num_workers: 8
+  prefetch_factor: 4
+  cache_mode: ram
+  normalization: imagenet
+  mask_threshold: 127
+  train_flip: true
+  train_rotate90: true
+
+model:
+  name: fc_siam_diff
+  in_channels: 3
+  base_channels: 32
+
+loss:
+  bce_weight: 1.0
+  dice_weight: 1.0
+  pos_weight: null
+
+training:
+  epochs: 20
+  batch_size: 32
+  learning_rate: 0.002
+  weight_decay: 0.0001
+  amp: true
+  grad_clip_norm: 1.0
+  log_interval: 20
+
+evaluation:
+  batch_size: 1
+  threshold: 0.5
+  save_predictions: true

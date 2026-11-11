@@ -3,7 +3,7 @@
 Change-aware registration and benefit-based output selection for frozen
 remote-sensing change detectors.
 
-This is a **private development backup** at
+This is the **private code archive for the accepted Remote Sensing article** at
 https://github.com/baowei10492/CARGO. Uploading this repository does not publish
 the manuscript or the patent material. A public release and software license
 have not been enabled.
@@ -75,12 +75,10 @@ interpreting results.
 
 Raw dataset images, large model checkpoints, generated predictions, experiment
 archives, manuscript sources, patent drafts and account credentials are not
-included. The available LEVIR-CD, DSIFN-CD and synthetic manifests are copied;
-additional WHU-CD/GZ-CD/S2Looking manifests referenced by some configurations
-must be supplied or regenerated with the corresponding dataset preparation
-tools. A dated manifest is not substituted for a missing final split.
-
-This upload backs up the code. It is not a claim that all historical results
-can be reproduced from this repository alone without the datasets,
-checkpoints and derived evaluation records. No public software license has
+included. The five dataset manifests under
+`manifests/datasets/` match Supplementary Data S1. See
+[录用版实验入口与运行说明](docs/ACCEPTED_CODE.md) for the revision experiments,
+their archived inputs, and the reproduction environment. Re-running trained
+models requires access to the corresponding images and model assets.
+No public software license has
 been chosen; dataset and third-party licenses continue to apply.

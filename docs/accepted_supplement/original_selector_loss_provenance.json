@@ -1,0 +1,24 @@
+{
+  "source": "Original selector training records",
+  "stopping": {
+    "LEVIR-CD": {
+      "stopped_epoch": 111,
+      "best_epoch": 51
+    },
+    "DSIFN-CD": {
+      "stopped_epoch": 105,
+      "best_epoch": 45
+    },
+    "WHU-CD": {
+      "stopped_epoch": 79,
+      "best_epoch": 19
+    }
+  },
+  "loss_samples": 14,
+  "recording_schedule": "Epoch 1 and every 25 epochs thereafter; connecting lines in the figure are visual guides.",
+  "maximum_epochs": 300,
+  "early_stopping_patience_epochs": 60,
+  "validation": "Tile-disjoint early-stopping split, separate from threshold calibration and testing.",
+  "training_loss_mode": "Optimization mode with dropout enabled",
+  "validation_loss_mode": "Evaluation mode with dropout disabled"
+}

@@ -1,0 +1,10 @@
+name: p8_whu_oracle_t2_shift
+seed: 3407
+batch_size: 8
+num_workers: 8
+prefetch_factor: 2
+
+corruptions:
+  - name: shift
+    severities: [1, 2, 3]
+    modes: [t2]
