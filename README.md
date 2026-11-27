@@ -3,10 +3,7 @@
 Change-aware registration and benefit-based output selection for frozen
 remote-sensing change detectors.
 
-This is the **private code archive for the accepted Remote Sensing article** at
-https://github.com/baowei10492/CARGO. Uploading this repository does not publish
-the manuscript or the patent material. A public release and software license
-have not been enabled.
+Code and experiment protocols for [CARGO: A Plug-and-Play Selective Registration Module for Change Detection Under Geometric Misalignment](https://doi.org/10.3390/rs18223912), published in *Remote Sensing*, 18(22), 3912 (2026).
 
 ## Method
 

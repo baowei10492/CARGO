@@ -1,6 +1,6 @@
 {
   "repository": "baowei10492/CARGO",
-  "required_visibility": "private",
+  "required_visibility": "public",
   "copied_source_files": {
     "configs/c2b_r_s2looking_eval_protocol.yaml": {
       "bytes": 439,
@@ -2988,8 +2988,8 @@
       "sha256": "f3cd33a9d9c21fcd5bc120bb4ed6429916d32ccabadd6066a48e554b11c59c87"
     },
     "README.md": {
-      "bytes": 3840,
-      "sha256": "27254dab6e978ea696cb1f8b6f91e02fccf5b4c251ca6252ad6cd80bbebd31ce"
+      "bytes": 3807,
+      "sha256": "c1ed17b150c657ced964ca63abd3bc1bab4876a960af5231472c2aadfba6ce21"
     },
     "configs/c2b_r_s2looking_eval_protocol.yaml": {
       "bytes": 439,
